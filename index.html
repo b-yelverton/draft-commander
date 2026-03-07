@@ -1,0 +1,1693 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Draft Commander — Live Draft Assistant</title>
+<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500;600;700&family=Outfit:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+*{margin:0;padding:0;box-sizing:border-box}
+:root{
+  --bg:#06090f;--surface:#0d1117;--surface2:#161b22;--surface3:#1c2333;
+  --border:#21262d;--border2:#30363d;
+  --text:#c9d1d9;--text2:#8b949e;--text3:#484f58;
+  --accent:#f0883e;--accent2:#d29922;
+  --qb:#f85149;--rb:#58a6ff;--wr:#3fb950;--te:#bc8cff;--pick:#d29922;
+  --live:#3fb950;--danger:#f85149;
+  --fc-color:#f0883e;--ktc-color:#a78bfa;--csv-color:#38bdf8;
+}
+body{background:var(--bg);color:var(--text);font-family:'Outfit',sans-serif;min-height:100vh;overflow-x:hidden}
+.mono{font-family:'IBM Plex Mono',monospace}
+
+/* Header */
+.hdr{background:var(--surface);border-bottom:1px solid var(--border);padding:10px 20px;display:flex;align-items:center;gap:14px;position:sticky;top:0;z-index:100}
+.hdr-logo{font-family:'IBM Plex Mono',monospace;font-size:13px;font-weight:700;color:var(--accent);letter-spacing:.5px}
+.hdr-sub{font-size:10px;color:var(--text3);letter-spacing:2px;text-transform:uppercase}
+.hdr-right{margin-left:auto;display:flex;align-items:center;gap:10px}
+.hdr-live{display:flex;align-items:center;gap:6px;font-size:11px;font-family:'IBM Plex Mono',monospace}
+.hdr-live .dot{width:7px;height:7px;border-radius:50%;background:var(--live);animation:blink 1.5s infinite}
+@keyframes blink{0%,100%{opacity:1}50%{opacity:.3}}
+.hdr-live.off .dot{background:var(--text3);animation:none}
+.src-pills{display:flex;gap:4px}
+.src-pill{font-size:9px;padding:2px 7px;border-radius:3px;font-family:'IBM Plex Mono',monospace;border:1px solid var(--border)}
+.src-pill.on{border-color:var(--live);color:var(--live)}
+.src-pill.off{color:var(--text3)}
+.src-pill.loading{color:var(--accent2);border-color:var(--accent2)}
+
+/* Setup */
+.setup{display:flex;flex-direction:column;align-items:center;justify-content:center;min-height:calc(100vh - 48px);padding:40px 20px}
+.setup h1{font-family:'IBM Plex Mono',monospace;font-size:24px;font-weight:700;margin-bottom:4px;color:var(--accent)}
+.setup p{color:var(--text2);font-size:13px;margin-bottom:28px;text-align:center;max-width:460px;line-height:1.6}
+.setup-form{display:flex;flex-direction:column;gap:12px;width:100%;max-width:440px}
+.setup-row{display:flex;gap:8px}
+.setup-row input,.setup-row select{flex:1;background:var(--surface2);border:1px solid var(--border);border-radius:6px;padding:12px 14px;color:var(--text);font-size:14px;font-family:inherit;outline:none}
+.setup-row input:focus,.setup-row select:focus{border-color:var(--accent)}
+.setup-row input::placeholder{color:var(--text3)}
+.btn{background:var(--accent);border:none;border-radius:6px;padding:12px 24px;color:#fff;font-size:13px;font-weight:600;cursor:pointer;font-family:inherit;transition:all .15s}
+.btn:hover{filter:brightness(1.1);transform:translateY(-1px)}
+.btn:disabled{opacity:.4;cursor:not-allowed;transform:none}
+.btn-sm{padding:6px 14px;font-size:11px;border-radius:4px}
+.btn-ghost{background:transparent;border:1px solid var(--border);color:var(--text2)}
+.btn-ghost:hover{border-color:var(--accent);color:var(--text)}
+.err{color:var(--danger);font-size:12px;text-align:center;margin-top:8px}
+.hint{color:var(--text3);font-size:11px;text-align:center;margin-top:14px;line-height:1.6}
+.loading{display:flex;flex-direction:column;align-items:center;justify-content:center;min-height:calc(100vh - 48px);gap:14px}
+.spin{width:32px;height:32px;border:2px solid var(--border);border-top-color:var(--accent);border-radius:50%;animation:sp .7s linear infinite}
+@keyframes sp{to{transform:rotate(360deg)}}
+.loading span{font-size:12px;color:var(--text2)}
+
+/* Draft Room */
+.room{display:grid;grid-template-columns:1fr 340px;grid-template-rows:auto 1fr;gap:0;height:calc(100vh - 48px);overflow:hidden}
+@media(max-width:1000px){.room{grid-template-columns:1fr;grid-template-rows:auto auto 1fr}}
+.room-top{grid-column:1/-1;background:var(--surface);border-bottom:1px solid var(--border);padding:10px 16px;display:flex;align-items:center;gap:12px;flex-wrap:wrap}
+.room-top .pick-clock{font-family:'IBM Plex Mono',monospace;font-size:18px;font-weight:700;color:var(--accent)}
+.room-top .pick-info{font-size:12px;color:var(--text2)}
+.room-top .pick-info strong{color:var(--text)}
+.room-top .draft-meta{margin-left:auto;display:flex;gap:12px;align-items:center}
+.room-top .draft-meta span{font-size:11px;color:var(--text3);font-family:'IBM Plex Mono',monospace}
+.room-tabs{display:flex;gap:2px;background:var(--surface2);border-radius:4px;padding:2px}
+.room-tab{padding:4px 12px;border-radius:3px;font-size:11px;font-weight:500;color:var(--text3);cursor:pointer;border:none;background:none;font-family:inherit}
+.room-tab:hover{color:var(--text2)}
+.room-tab.active{background:var(--surface3);color:var(--accent)}
+.refresh-btn{background:var(--surface2);border:1px solid var(--border);border-radius:4px;padding:4px 10px;color:var(--text2);font-size:10px;cursor:pointer;font-family:inherit}
+.refresh-btn:hover{border-color:var(--accent);color:var(--text)}
+
+/* Board Panel */
+.board-panel{overflow-y:auto;border-right:1px solid var(--border)}
+.board-panel::-webkit-scrollbar{width:6px}
+.board-panel::-webkit-scrollbar-thumb{background:var(--border2);border-radius:3px}
+.section-hdr{font-family:'IBM Plex Mono',monospace;font-size:10px;color:var(--text3);letter-spacing:1.5px;text-transform:uppercase;padding:10px 14px 6px;background:var(--surface);position:sticky;top:0;z-index:5;border-bottom:1px solid var(--border)}
+.pos-filters{display:flex;gap:2px;padding:8px 14px;background:var(--surface);border-bottom:1px solid var(--border);position:sticky;top:28px;z-index:4}
+.pos-filter{padding:4px 10px;border-radius:4px;font-size:11px;font-weight:500;color:var(--text3);cursor:pointer;border:none;background:none;font-family:inherit}
+.pos-filter:hover{color:var(--text2)}
+.pos-filter.active{background:var(--surface3);color:var(--text)}
+
+/* Player rows */
+.p-row{display:flex;align-items:center;gap:6px;padding:7px 14px;border-bottom:1px solid var(--border);transition:background .1s;cursor:default;font-size:12px}
+.p-row:hover{background:var(--surface2)}
+.p-row.recommended{background:rgba(240,136,62,.06);border-left:2px solid var(--accent)}
+.p-row.divergent{border-right:2px solid var(--danger)}
+.p-rank{font-family:'IBM Plex Mono',monospace;color:var(--text3);width:24px;font-size:11px;text-align:right;flex-shrink:0}
+.p-pos{display:inline-block;width:26px;text-align:center;padding:1px 0;border-radius:3px;font-size:10px;font-weight:600;font-family:'IBM Plex Mono',monospace;flex-shrink:0}
+.p-QB{background:rgba(248,81,73,.12);color:var(--qb)}
+.p-RB{background:rgba(88,166,255,.12);color:var(--rb)}
+.p-WR{background:rgba(63,185,80,.12);color:var(--wr)}
+.p-TE{background:rgba(188,140,255,.12);color:var(--te)}
+.p-PICK{background:rgba(210,153,34,.12);color:var(--pick)}
+.p-name{flex:1;font-weight:500;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.p-team{color:var(--text3);font-size:10px;width:28px;flex-shrink:0;font-family:'IBM Plex Mono',monospace}
+.p-val{font-family:'IBM Plex Mono',monospace;font-size:11px;width:44px;text-align:right;flex-shrink:0}
+.p-val.fc{color:var(--fc-color)}
+.p-val.ktc{color:var(--ktc-color)}
+.p-val.comp{color:var(--text);font-weight:600}
+.p-div{font-size:9px;width:16px;text-align:center;flex-shrink:0;cursor:help}
+
+/* My picks */
+.my-picks{display:flex;gap:6px;flex-wrap:wrap;margin-top:6px}
+.my-pick{background:var(--surface2);border:1px solid var(--border);border-radius:4px;padding:4px 8px;font-size:10px;font-family:'IBM Plex Mono',monospace;color:var(--text2)}
+.my-pick.next{border-color:var(--accent);color:var(--accent);font-weight:600}
+.my-pick.used{opacity:.4}
+
+/* Sidebar */
+.sidebar{overflow-y:auto;background:var(--surface);display:flex;flex-direction:column}
+.sidebar::-webkit-scrollbar{width:6px}
+.sidebar::-webkit-scrollbar-thumb{background:var(--border2);border-radius:3px}
+.sb-section{padding:12px 14px;border-bottom:1px solid var(--border)}
+.sb-title{font-family:'IBM Plex Mono',monospace;font-size:10px;color:var(--text3);letter-spacing:1.5px;text-transform:uppercase;margin-bottom:10px}
+.sb-rec{background:var(--surface2);border:1px solid var(--border);border-radius:6px;padding:10px 12px;margin-bottom:8px}
+.sb-rec .label{font-size:10px;color:var(--accent);text-transform:uppercase;letter-spacing:1px;margin-bottom:4px;font-family:'IBM Plex Mono',monospace}
+.sb-rec .player{font-size:14px;font-weight:600;margin-bottom:2px}
+.sb-rec .reason{font-size:11px;color:var(--text2);line-height:1.5}
+.draft-log{max-height:200px;overflow-y:auto}
+.log-row{display:flex;align-items:center;gap:6px;padding:4px 0;font-size:11px;border-bottom:1px solid var(--border)}
+.log-pick{font-family:'IBM Plex Mono',monospace;color:var(--text3);width:36px;font-size:10px}
+.log-name{flex:1;font-weight:500}
+.log-owner{color:var(--text3);font-size:10px}
+
+/* Sources panel */
+.sources-panel{padding:12px 14px;border-bottom:1px solid var(--border)}
+.weight-row{display:flex;align-items:center;gap:8px;margin-bottom:8px}
+.weight-row .src-label{font-size:11px;width:70px;font-weight:500}
+.weight-row .src-status{font-size:9px;font-family:'IBM Plex Mono',monospace;width:36px}
+.weight-row input[type=range]{flex:1;accent-color:var(--accent);height:4px}
+.weight-row .src-pct{font-family:'IBM Plex Mono',monospace;font-size:11px;width:32px;text-align:right;color:var(--accent)}
+
+/* Chart */
+.chart-panel{overflow-y:auto;border-right:1px solid var(--border);padding:16px}
+.chart-legend{display:flex;gap:16px;flex-wrap:wrap;padding:10px 0;font-size:11px}
+.chart-legend-item{display:flex;align-items:center;gap:4px}
+.chart-legend-dot{width:8px;height:8px;border-radius:50%}
+.chart-stats{display:grid;grid-template-columns:repeat(3,1fr);gap:10px;margin-top:12px}
+.chart-stat{background:var(--surface2);border-radius:6px;padding:10px 12px;text-align:center}
+.chart-stat .num{font-family:'IBM Plex Mono',monospace;font-size:20px;font-weight:700}
+.chart-stat .lbl{font-size:10px;color:var(--text3);margin-top:2px}
+.pick-detail{display:grid;grid-template-columns:1fr 1fr 1fr 1fr;gap:1px;margin-top:14px;font-size:11px}
+.pick-detail-hdr{background:var(--surface2);padding:6px 10px;font-family:'IBM Plex Mono',monospace;color:var(--text3);font-size:10px;text-transform:uppercase;letter-spacing:.5px}
+.pick-detail-cell{background:var(--surface);padding:6px 10px;border-bottom:1px solid var(--border)}
+.pick-detail-cell.steal{color:var(--live)}
+.pick-detail-cell.reach{color:var(--danger)}
+
+/* Modal */
+.modal-overlay{position:fixed;inset:0;background:rgba(0,0,0,.7);z-index:200;display:flex;align-items:center;justify-content:center}
+.modal{background:var(--surface);border:1px solid var(--border);border-radius:12px;padding:24px;width:90%;max-width:520px;max-height:80vh;overflow-y:auto}
+.modal h3{font-family:'IBM Plex Mono',monospace;font-size:14px;margin-bottom:14px;color:var(--accent)}
+.modal textarea{width:100%;height:200px;background:var(--surface2);border:1px solid var(--border);border-radius:6px;padding:12px;color:var(--text);font-size:12px;font-family:'IBM Plex Mono',monospace;resize:vertical;outline:none}
+.modal textarea:focus{border-color:var(--accent)}
+.modal-btns{display:flex;gap:8px;margin-top:12px;justify-content:flex-end}
+
+/* Trade Evaluator */
+.trade-side{background:var(--surface2);border:1px solid var(--border);border-radius:8px;padding:14px;flex:1}
+.trade-side h4{font-family:'IBM Plex Mono',monospace;font-size:11px;color:var(--text3);text-transform:uppercase;letter-spacing:1px;margin-bottom:10px}
+.trade-input{display:flex;gap:6px;margin-bottom:10px}
+.trade-input input{flex:1;background:var(--bg);border:1px solid var(--border);border-radius:4px;padding:8px 10px;color:var(--text);font-size:12px;font-family:inherit;outline:none}
+.trade-input input:focus{border-color:var(--accent)}
+.trade-input input::placeholder{color:var(--text3)}
+.trade-chip{display:inline-flex;align-items:center;gap:4px;background:var(--surface3);border:1px solid var(--border);border-radius:4px;padding:3px 8px;font-size:11px;margin:2px}
+.trade-chip .x{cursor:pointer;color:var(--text3);font-size:9px}
+.trade-chip .x:hover{color:var(--danger)}
+.trade-verdict{text-align:center;padding:16px;margin-top:14px;background:var(--surface2);border-radius:8px;border:1px solid var(--border)}
+.trade-verdict .result{font-family:'IBM Plex Mono',monospace;font-size:24px;font-weight:700}
+.trade-verdict .detail{font-size:12px;color:var(--text2);margin-top:6px;line-height:1.6}
+
+/* Run Alerts */
+.run-alert{background:rgba(248,81,73,.08);border:1px solid rgba(248,81,73,.2);border-radius:6px;padding:10px 12px;margin-bottom:8px}
+.run-alert .run-title{font-size:11px;font-weight:600;color:var(--danger);margin-bottom:4px}
+.run-alert .run-detail{font-size:11px;color:var(--text2);line-height:1.5}
+
+/* Trade-back alert */
+.tb-alert{background:rgba(63,185,80,.06);border:1px solid rgba(63,185,80,.2);border-radius:6px;padding:10px 12px;margin-bottom:8px}
+.tb-alert .tb-title{font-size:11px;font-weight:600;color:var(--live);margin-bottom:4px;display:flex;align-items:center;gap:4px}
+.tb-alert .tb-detail{font-size:11px;color:var(--text2);line-height:1.6}
+.tb-alert .tb-offer{background:var(--surface2);border:1px solid var(--border);border-radius:4px;padding:6px 8px;margin-top:6px;font-family:'IBM Plex Mono',monospace;font-size:10px;color:var(--text);line-height:1.5}
+
+/* Opponent profiles */
+.opp-card{background:var(--surface2);border:1px solid var(--border);border-radius:6px;padding:8px 10px;margin-bottom:6px}
+.opp-hdr{display:flex;align-items:center;gap:6px;margin-bottom:4px}
+.opp-name{font-size:12px;font-weight:600;flex:1}
+.opp-tag{font-size:9px;padding:1px 6px;border-radius:3px;font-family:'IBM Plex Mono',monospace;font-weight:600}
+.opp-tag.rebuild{background:rgba(88,166,255,.12);color:var(--rb)}
+.opp-tag.contender{background:rgba(248,81,73,.12);color:var(--qb)}
+.opp-tag.balanced{background:rgba(63,185,80,.12);color:var(--wr)}
+.opp-tag.unknown{background:rgba(139,148,158,.12);color:var(--text3)}
+.opp-bar{display:flex;height:4px;border-radius:2px;overflow:hidden;margin:4px 0}
+.opp-bar span{height:100%}
+.opp-stats{display:flex;gap:8px;font-size:10px;color:var(--text3);font-family:'IBM Plex Mono',monospace}
+.opp-need{font-size:10px;color:var(--accent);margin-top:3px}
+
+/* Monte Carlo */
+.mc-bar-wrap{display:flex;align-items:center;gap:6px;margin-bottom:6px}
+.mc-bar-label{font-size:11px;width:80px;font-weight:500}
+.mc-bar-track{flex:1;height:16px;background:var(--surface2);border-radius:3px;overflow:hidden;position:relative}
+.mc-bar-fill{height:100%;border-radius:3px;transition:width .3s}
+.mc-bar-pct{font-size:10px;font-family:'IBM Plex Mono',monospace;width:40px;text-align:right}
+.mc-detail{font-size:10px;color:var(--text3);margin-top:2px;font-family:'IBM Plex Mono',monospace}
+
+/* Future pick chips in trade */
+.fpick-chip{display:inline-flex;align-items:center;gap:3px;background:rgba(210,153,34,.1);border:1px solid rgba(210,153,34,.3);border-radius:4px;padding:3px 7px;font-size:10px;font-family:'IBM Plex Mono',monospace;color:var(--pick);margin:2px;cursor:pointer}
+.fpick-chip:hover{border-color:var(--pick);background:rgba(210,153,34,.2)}
+
+/* Draft Selector */
+.draft-select{display:flex;flex-direction:column;align-items:center;min-height:calc(100vh - 48px);padding:30px 20px}
+.draft-select h2{font-family:'IBM Plex Mono',monospace;font-size:18px;font-weight:700;color:var(--accent);margin-bottom:4px}
+.draft-select .sub{color:var(--text2);font-size:12px;margin-bottom:20px}
+.draft-select .back-link{color:var(--text3);font-size:11px;cursor:pointer;margin-bottom:16px;display:inline-flex;align-items:center;gap:4px}
+.draft-select .back-link:hover{color:var(--text)}
+.draft-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(320px,1fr));gap:10px;width:100%;max-width:1000px}
+.draft-card{background:var(--surface);border:1px solid var(--border);border-radius:8px;padding:14px 16px;cursor:pointer;transition:all .15s}
+.draft-card:hover{border-color:var(--accent);transform:translateY(-1px);box-shadow:0 4px 12px rgba(0,0,0,.3)}
+.draft-card.live{border-color:var(--live);box-shadow:0 0 0 1px var(--live)}
+.draft-card .dc-top{display:flex;align-items:center;gap:8px;margin-bottom:8px}
+.draft-card .dc-status{font-size:9px;padding:2px 7px;border-radius:3px;font-family:'IBM Plex Mono',monospace;font-weight:600}
+.draft-card .dc-status.drafting{background:rgba(63,185,80,.15);color:var(--live)}
+.draft-card .dc-status.pre_draft{background:rgba(240,136,62,.15);color:var(--accent)}
+.draft-card .dc-status.complete{background:rgba(139,148,158,.12);color:var(--text3)}
+.draft-card .dc-name{font-size:14px;font-weight:600;flex:1;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.draft-card .dc-meta{display:flex;gap:10px;font-size:11px;color:var(--text2);margin-bottom:6px;flex-wrap:wrap}
+.draft-card .dc-meta span{display:flex;align-items:center;gap:3px}
+.draft-card .dc-tags{display:flex;gap:4px;flex-wrap:wrap}
+.draft-card .dc-tag{font-size:9px;padding:1px 6px;border-radius:3px;font-family:'IBM Plex Mono',monospace;background:var(--surface2);color:var(--text3);border:1px solid var(--border)}
+.draft-card .dc-tag.sf{color:var(--qb);border-color:rgba(248,81,73,.2)}
+.draft-card .dc-tag.tep{color:var(--te);border-color:rgba(188,140,255,.2)}
+.draft-card .dc-tag.dyn{color:var(--accent);border-color:rgba(240,136,62,.2)}
+.draft-card .dc-progress{height:3px;background:var(--surface2);border-radius:2px;margin-top:8px;overflow:hidden}
+.draft-card .dc-progress-bar{height:100%;border-radius:2px;background:var(--accent);transition:width .3s}
+.draft-year-hdr{font-family:'IBM Plex Mono',monospace;font-size:11px;color:var(--text3);letter-spacing:1.5px;text-transform:uppercase;padding:8px 0 4px;width:100%;max-width:1000px}
+</style>
+</head>
+<body>
+<div class="hdr">
+  <div>
+    <div class="hdr-logo">Draft Commander</div>
+    <div class="hdr-sub">Live Draft Assistant</div>
+  </div>
+  <div class="hdr-right">
+    <div class="src-pills" id="srcPills"></div>
+    <button class="refresh-btn" id="switchDraftBtn" style="display:none">Switch Draft</button>
+    <div class="hdr-live off" id="liveIndicator">
+      <div class="dot"></div>
+      <span id="liveText">Offline</span>
+    </div>
+  </div>
+</div>
+<div id="app"></div>
+<script>
+const SLEEPER='https://api.sleeper.app/v1';
+const FC_API='https://api.fantasycalc.com/values/current';
+const KTC_PROXIES=['https://api.allorigins.win/raw?url=','https://corsproxy.io/?'];
+const LS_PREFIX='draftcmdr_';
+
+// ── Persistence ──
+function saveLocal(key,val){try{localStorage.setItem(LS_PREFIX+key,JSON.stringify(val));}catch(e){}}
+function loadLocal(key,fallback){try{const v=localStorage.getItem(LS_PREFIX+key);return v?JSON.parse(v):fallback;}catch(e){return fallback;}}
+function clearLocal(key){try{localStorage.removeItem(LS_PREFIX+key);}catch(e){}}
+
+// Restore persisted state
+const _savedUsername=loadLocal('username','');
+const _savedWeights=loadLocal('weights',null);
+const _savedKtc=loadLocal('ktc_cache',null);
+const _savedCsv=loadLocal('csv_cache',null);
+
+// ── State ──
+const S={
+  view:'setup',draftId:'',username:_savedUsername||'',userId:null,
+  draft:null,picks:[],users:[],league:null,playerDb:null,
+  posFilter:'ALL',showRookies:false,roomTab:'board',
+  pollTimer:null,lastPollCount:0,error:'',loadingMsg:'',
+  modal:null, // null | 'ktcPaste' | 'csvUpload'
+  draftList:[], // [{draft,league,leagueName,year}...]
+  trade:{send:[],receive:[],sendInput:'',receiveInput:''}, // trade evaluator state
+  // Multi-source data
+  sources:{
+    fc:{data:{},status:'idle',max:11000,weight:_savedWeights?.fc??50,label:'FantasyCalc',color:'var(--fc-color)'},
+    ktc:{data:_savedKtc?.data||{},status:_savedKtc?.data&&Object.keys(_savedKtc.data).length>10?'live':'idle',max:_savedKtc?.max||9999,weight:_savedWeights?.ktc??30,label:'KTC',color:'var(--ktc-color)'},
+    csv:{data:_savedCsv?.data||{},status:_savedCsv?.data&&Object.keys(_savedCsv.data).length>5?'live':'idle',max:_savedCsv?.max||10000,weight:_savedWeights?.csv??20,label:'Custom',color:'var(--csv-color)',name:_savedCsv?.name||''},
+  },
+};
+
+async function fetchJSON(u){const r=await fetch(u);if(!r.ok)throw new Error('HTTP '+r.status);return r.json();}
+
+// ── Sleeper API ──
+const getDraft=id=>fetchJSON(`${SLEEPER}/draft/${id}`);
+const getDraftPicks=id=>fetchJSON(`${SLEEPER}/draft/${id}/picks`);
+const getLeagueUsers=id=>fetchJSON(`${SLEEPER}/league/${id}/users`);
+const lookupUser=u=>fetchJSON(`${SLEEPER}/user/${u}`);
+const getPlayers=()=>fetchJSON(`${SLEEPER}/players/nfl`);
+
+// ── FantasyCalc ──
+async function loadFC(numQbs,numTeams,ppr){
+  S.sources.fc.status='loading';updatePills();
+  try{
+    const data=await fetchJSON(`${FC_API}?isDynasty=true&numQbs=${numQbs}&numTeams=${numTeams}&ppr=${ppr}`);
+    const d={};let mx=0;
+    data.forEach(p=>{if(!p.player)return;
+      const sid=p.player.sleeperId;const nk=normName(p.player.name);
+      const obj={name:p.player.name,value:p.value,rank:p.overallRank,posRank:p.positionRank,trend:p.trend30Day,position:p.player.position,team:p.player.maybeTeam,age:p.player.maybeAge,sleeperId:sid};
+      if(sid)d[sid]=obj;d['n:'+nk]=obj;if(p.value>mx)mx=p.value;
+    });
+    S.sources.fc.data=d;S.sources.fc.max=mx||11000;S.sources.fc.status='live';
+  }catch(e){console.error('FC:',e);S.sources.fc.status='error';}
+  updatePills();render();
+}
+
+// ── KTC Scraping ──
+async function loadKTC(){
+  S.sources.ktc.status='loading';updatePills();
+  let html=null;
+  // Try CORS proxies
+  for(const proxy of KTC_PROXIES){
+    try{const r=await fetch(proxy+encodeURIComponent('https://keeptradecut.com/dynasty-rankings'));
+      if(r.ok){html=await r.text();break;}}catch(e){continue;}
+  }
+  if(html){parseKTC(html);return;}
+  S.sources.ktc.status='unavailable';updatePills();render();
+}
+
+function parseKTC(html){
+  const d={};let mx=0;
+  // KTC server-renders a table-like structure. Parse the text content.
+  // Pattern: RANK NAME+TEAM POSRANK • AGE y.o. Tier N TREND VALUE
+  const re=/(\d+)\s+([A-Za-z'.·\-\s]+?)([A-Z]{2,3})\s+(QB|RB|WR|TE)(\d+)\s*[•·]\s*([\d.]+)\s*y\.o\.\s*Tier\s*(\d+)\s*(-?\d+)\s+(\d+)/g;
+  let m;
+  while((m=re.exec(html))!==null){
+    const name=m[2].trim(),val=parseInt(m[9]),nk=normName(name);
+    if(name&&val>0){
+      d[nk]={name,team:m[3],position:m[4],posRank:parseInt(m[5]),age:parseFloat(m[6]),tier:parseInt(m[7]),trend:parseInt(m[8]),value:val,rank:parseInt(m[1])};
+      if(val>mx)mx=val;
+    }
+  }
+  const count=Object.keys(d).length;
+  S.sources.ktc.data=d;S.sources.ktc.max=mx||9999;
+  S.sources.ktc.status=count>20?'live':'parse-error';
+  updatePills();render();
+}
+
+function parseKTCPaste(text,append){
+  const d=append?{...S.sources.ktc.data}:{};let mx=S.sources.ktc.max||0;
+  // Clean up: normalize whitespace, remove empty lines clusters
+  const lines=text.split('\n').map(l=>l.trim()).filter(l=>l.length>0);
+  
+  // Strategy: scan for lines that are just a number (rank), then grab the next lines
+  // Pattern: RANK, NAME+TEAM, POS+AGE, Tier, TREND, VALUE
+  for(let i=0;i<lines.length;i++){
+    // Is this line a standalone rank number (1-500)?
+    if(!/^\d{1,3}$/.test(lines[i]))continue;
+    const rank=parseInt(lines[i]);
+    if(rank<1||rank>500)continue;
+    
+    // Next line should be player name + team (e.g., "Bijan RobinsonATL" or "2027 Early 1st")
+    const nameLine=lines[i+1];if(!nameLine)continue;
+    
+    // Check if this is a draft pick
+    const pickMatch=nameLine.match(/^(20\d\d\s+(?:Early|Mid|Late)\s+\d+(?:st|nd|rd|th))/i);
+    if(pickMatch){
+      // It's a pick — look for PICK line, Tier, trend, value
+      let value=0;
+      for(let j=i+2;j<Math.min(i+8,lines.length);j++){
+        if(/^\d{3,5}$/.test(lines[j])){value=parseInt(lines[j]);break;}
+      }
+      if(value>0){
+        const nk=normName(pickMatch[1]);
+        d[nk]={name:pickMatch[1],position:'PICK',team:'',value,rank,age:null,tier:null,trend:0};
+        if(value>mx)mx=value;
+      }
+      continue;
+    }
+    
+    // Regular player: extract name and team from combined string
+    // "Bijan RobinsonATL" — team is 2-3 uppercase letters at end
+    // "Amon-Ra St. BrownDET" — handle dots, hyphens, apostrophes
+    // "De'Von AchaneMIA"
+    const playerMatch=nameLine.match(/^(.+?)([A-Z]{2,3})$/);
+    if(!playerMatch)continue;
+    const name=playerMatch[1].trim();
+    const team=playerMatch[2];
+    
+    // Next line(s): position+age, e.g., "RB1•24.1 y.o." or "QB3•24.3 y.o."
+    let pos='',posRank=0,age=null,tier=null,trend=0,value=0;
+    
+    for(let j=i+2;j<Math.min(i+10,lines.length);j++){
+      const line=lines[j];
+      // Position + age line
+      const posMatch=line.match(/^(QB|RB|WR|TE)(\d+)\s*[•·]\s*([\d.]+|N\/A)\s*y\.o\.$/);
+      if(posMatch){pos=posMatch[1];posRank=parseInt(posMatch[2]);age=posMatch[3]==='N/A'?null:parseFloat(posMatch[3]);continue;}
+      // Tier line
+      const tierMatch=line.match(/^Tier\s+(\d+)$/);
+      if(tierMatch){tier=parseInt(tierMatch[1]);continue;}
+      // Value scanning: after finding tier, next small number is trend, then 4-digit number is value
+      if(/^-?\d{1,3}$/.test(line)&&tier!==null&&!value){trend=parseInt(line);continue;}
+      if(/^\d{4,5}$/.test(line)&&tier!==null){value=parseInt(line);break;}
+    }
+    
+    if(name&&pos&&value>0){
+      const nk=normName(name);
+      d[nk]={name,team,position:pos,posRank,age,tier,trend,value,rank};
+      if(value>mx)mx=value;
+    }
+  }
+  
+  const count=Object.keys(d).length;
+  console.log(`KTC paste parsed ${count} players`);
+  S.sources.ktc.data=d;S.sources.ktc.max=mx||9999;
+  S.sources.ktc.status=count>10?'live':'parse-error';
+  if(count>10)saveLocal('ktc_cache',{data:d,max:mx||9999,ts:Date.now()});
+  updatePills();render();
+}
+
+// ── CSV Upload ──
+function parseCSV(text,srcName){
+  const lines=text.trim().split('\n');if(lines.length<2)return;
+  const hdr=lines[0].toLowerCase();const d={};let mx=0;
+  const sep=hdr.includes(';')?';':',';
+  const cols=hdr.split(sep).map(c=>c.trim().replace(/"/g,''));
+  const iName=cols.findIndex(c=>c.includes('name'));
+  const iPos=cols.findIndex(c=>c.includes('pos'));
+  const iVal=cols.findIndex(c=>c.includes('value')||c.includes('val'));
+  const iTeam=cols.findIndex(c=>c.includes('team'));
+  const iRank=cols.findIndex(c=>c.includes('rank'));
+  const iAge=cols.findIndex(c=>c.includes('age'));
+  for(let i=1;i<lines.length;i++){
+    const r=lines[i].split(sep).map(c=>c.trim().replace(/"/g,''));
+    const name=r[iName]||'';const val=parseInt(r[iVal])||0;
+    if(!name||!val)continue;
+    const nk=normName(name);
+    d[nk]={name,position:r[iPos]||'',team:r[iTeam]||'',value:val,rank:parseInt(r[iRank])||i,age:parseFloat(r[iAge])||null};
+    if(val>mx)mx=val;
+  }
+  S.sources.csv.data=d;S.sources.csv.max=mx||10000;
+  S.sources.csv.status=Object.keys(d).length>5?'live':'error';
+  S.sources.csv.name=srcName||'CSV';
+  if(Object.keys(d).length>5)saveLocal('csv_cache',{data:d,max:mx||10000,name:srcName||'CSV',ts:Date.now()});
+  updatePills();render();
+}
+
+// ── Name Normalization ──
+function normName(n){return(n||'').toLowerCase().replace(/[^a-z]/g,'');}
+
+// ── Multi-Source Value Engine ──
+function getSourceValue(srcKey,playerName,sleeperId){
+  const src=S.sources[srcKey];if(!src||src.status==='idle'||src.status==='error')return null;
+  if(srcKey==='fc'){
+    // FC indexed by sleeper ID and name
+    if(sleeperId&&src.data[sleeperId])return src.data[sleeperId].value;
+    const nk='n:'+normName(playerName);if(src.data[nk])return src.data[nk].value;
+  }else{
+    // KTC and CSV indexed by normalized name
+    const nk=normName(playerName);if(src.data[nk])return src.data[nk].value;
+  }
+  return null;
+}
+
+function normalizeValue(val,srcMax){return(val/srcMax)*10000;}
+
+// ── Rank-Based Comparison Engine ──
+function getSourceRanks(playerName,sleeperId){
+  const ranks={};
+  // FC ranks
+  const fcSrc=S.sources.fc;
+  if(fcSrc.status==='live'){
+    let fcP=null;
+    if(sleeperId&&fcSrc.data[sleeperId])fcP=fcSrc.data[sleeperId];
+    else{const nk='n:'+normName(playerName);if(fcSrc.data[nk])fcP=fcSrc.data[nk];}
+    if(fcP){ranks.fc={rank:fcP.rank,posRank:fcP.posRank,pos:fcP.position,value:fcP.value};}
+  }
+  // KTC ranks
+  const ktcSrc=S.sources.ktc;
+  if(ktcSrc.status==='live'){
+    const nk=normName(playerName);const ktcP=ktcSrc.data[nk];
+    if(ktcP){ranks.ktc={rank:ktcP.rank,posRank:ktcP.posRank,pos:ktcP.position,value:ktcP.value,tier:ktcP.tier};}
+  }
+  // CSV ranks
+  const csvSrc=S.sources.csv;
+  if(csvSrc.status==='live'){
+    const nk=normName(playerName);const csvP=csvSrc.data[nk];
+    if(csvP){ranks.csv={rank:csvP.rank,posRank:csvP.posRank||null,pos:csvP.position,value:csvP.value};}
+  }
+  return ranks;
+}
+
+function getPlayerAnalysis(playerName,sleeperId,fcData){
+  const ranks=getSourceRanks(playerName,sleeperId);
+  const sourceCount=Object.keys(ranks).length;
+  
+  // Primary rank: use FC rank as baseline, fall back to KTC
+  const fcRank=ranks.fc?.rank||999;
+  const ktcRank=ranks.ktc?.rank||null;
+  const csvRank=ranks.csv?.rank||null;
+  
+  // Composite rank: weighted average of available ranks
+  let compositeRank=fcRank;
+  if(sourceCount>1){
+    let totalW=0,weightedSum=0;
+    if(ranks.fc){const w=S.sources.fc.weight;weightedSum+=fcRank*w;totalW+=w;}
+    if(ranks.ktc){const w=S.sources.ktc.weight;weightedSum+=ktcRank*w;totalW+=w;}
+    if(ranks.csv){const w=S.sources.csv.weight;weightedSum+=csvRank*w;totalW+=w;}
+    compositeRank=totalW>0?Math.round(weightedSum/totalW):fcRank;
+  }
+  
+  // Rank divergence (FC vs KTC)
+  const rankDelta=ktcRank!==null?(fcRank-ktcRank):null; // positive = KTC ranks higher (better)
+  
+  // Positional rank divergence
+  const fcPosRank=ranks.fc?.posRank||null;
+  const ktcPosRank=ranks.ktc?.posRank||null;
+  const posRankDelta=(fcPosRank!==null&&ktcPosRank!==null)?(fcPosRank-ktcPosRank):null; // positive = KTC pos rank is better
+  
+  // Divergence severity
+  let divergence='none';
+  if(rankDelta!==null){
+    const absDelta=Math.abs(rankDelta);
+    if(absDelta>=15)divergence='high';
+    else if(absDelta>=8)divergence='medium';
+    else if(absDelta>=4)divergence='low';
+  }
+  
+  // Value for sorting (use composite normalized value for BPA ordering)
+  let sortValue=ranks.fc?.value||0;
+  if(sourceCount>1){
+    let totalW=0,wSum=0;
+    Object.entries(ranks).forEach(([k,r])=>{
+      const w=S.sources[k].weight;const nv=normalizeValue(r.value,S.sources[k].max);
+      wSum+=nv*w;totalW+=w;
+    });
+    sortValue=totalW>0?wSum/totalW:sortValue;
+  }
+  
+  return{ranks,sourceCount,compositeRank,fcRank,ktcRank,csvRank,
+    fcPosRank,ktcPosRank,rankDelta,posRankDelta,divergence,sortValue,
+    fcValue:ranks.fc?.value||0,ktcValue:ranks.ktc?.value||0,ktcTier:ranks.ktc?.tier||null};
+}
+
+// ── Player Resolution ──
+function isKicker(id){return S.playerDb&&S.playerDb[id]?.position==='K';}
+function isRookie(id){return S.playerDb&&(S.playerDb[id]?.years_exp===0||S.playerDb[id]?.years_exp==='0');}
+
+function getKickerPickNum(id){
+  let n=0;for(const p of S.picks){if(isKicker(p.player_id)){n++;if(p.player_id===id)return n;}}return null;
+}
+
+function fmtPick(n,teams){const r=Math.ceil(n/(teams||12)),p=((n-1)%(teams||12))+1;return`2026 Pick ${r}.${String(p).padStart(2,'0')}`;}
+
+function resolvePlayer(id){
+  if(isKicker(id)){
+    const pn=getKickerPickNum(id);const teams=S.draft?.settings?.teams||12;
+    return{id,name:pn?fmtPick(pn,teams):'2026 Pick',position:'PICK',team:'2026',age:null,isRookiePick:true,rookiePickNum:pn};
+  }
+  // FC data (has sleeper IDs)
+  const fc=S.sources.fc.data;
+  if(fc[id]){const p=fc[id];return{id,...p};}
+  // Sleeper DB
+  if(S.playerDb&&S.playerDb[id]){
+    const p=S.playerDb[id];const name=`${p.first_name} ${p.last_name}`;
+    const nk='n:'+normName(name);const fcP=fc[nk];
+    return{id,name,position:p.position,team:p.team,age:p.age,
+      value:fcP?.value||0,rank:fcP?.rank||999,posRank:fcP?.posRank||99,trend:fcP?.trend||0,
+      isRookie:p.years_exp===0||p.years_exp==='0'};
+  }
+  return null;
+}
+
+// ── Draft Logic ──
+function getDraftedIds(){return new Set(S.picks.map(p=>p.player_id));}
+
+function getMyPicks(){
+  if(!S.draft||!S.userId)return[];
+  const ord=S.draft.draft_order||{};
+  const e=Object.entries(ord).find(([uid])=>uid===S.userId);
+  if(!e)return[];
+  const slot=parseInt(e[1]),teams=S.draft.settings?.teams||12,rounds=S.draft.settings?.rounds||20;
+  const type=S.draft.type;const picks=[];
+  // Handle snake with R3 reversal (common in startups)
+  for(let r=1;r<=rounds;r++){
+    let p;
+    if(type==='snake'||type==='snake_devy'){p=r%2===1?slot:(teams-slot+1);}
+    else{p=slot;}
+    picks.push({round:r,pick:p,overall:(r-1)*teams+p});
+  }
+  return picks;
+}
+
+function getNextPick(){const mp=getMyPicks();return mp.find(p=>p.overall>S.picks.length);}
+function getPicksUntil(){const n=getNextPick();return n?n.overall-S.picks.length:null;}
+
+function getBestAvailable(pos){
+  const drafted=getDraftedIds();const all=[];
+  Object.entries(S.sources.fc.data).forEach(([k,p])=>{
+    if(k.startsWith('n:'))return;
+    if(drafted.has(k)||drafted.has(p.sleeperId))return;
+    if(pos&&pos!=='ALL'&&p.position!==pos)return;
+    if(!['QB','RB','WR','TE'].includes(p.position))return;
+    if(!S.showRookies&&p.sleeperId&&S.playerDb&&S.playerDb[p.sleeperId]){
+      if(S.playerDb[p.sleeperId].years_exp===0||S.playerDb[p.sleeperId].years_exp==='0')return;
+    }
+    const analysis=getPlayerAnalysis(p.name,p.sleeperId||k,p);
+    all.push({id:k,...p,...analysis});
+  });
+  all.sort((a,b)=>a.compositeRank-b.compositeRank);
+  return all;
+}
+
+function getRecommendations(){
+  const recs=[];const ba=getBestAvailable('ALL');if(!ba.length)return recs;
+  if(ba[0])recs.push({label:'Best Player Available',player:ba[0],reason:`Composite #${ba[0].compositeRank} · FC #${ba[0].fcRank}${ba[0].ktcRank?' · KTC #'+ba[0].ktcRank:''}`});
+  ['QB','RB','WR','TE'].forEach(pos=>{
+    const best=getBestAvailable(pos);
+    if(best[0]&&best[0].id!==ba[0]?.id)recs.push({label:`Best ${pos}`,player:best[0],reason:`${pos}${best[0].fcPosRank||'?'}${best[0].ktcPosRank?' (KTC: '+pos+best[0].ktcPosRank+')':''}`});
+  });
+  // Value steals — players ranked much higher than current pick
+  const pick=S.picks.length+1;
+  ba.filter(p=>p.compositeRank<pick-10).slice(0,2).forEach(p=>{
+    if(!recs.find(r=>r.player.id===p.id))recs.push({label:'Value Steal',player:p,reason:`Ranked #${p.compositeRank}, available at pick ${pick} · +${pick-p.compositeRank} picks of value`});
+  });
+  // Rank divergence alerts — KTC much higher than FC (potential sell-high targets)
+  const hasKtc=S.sources.ktc.status==='live';
+  if(hasKtc){
+    ba.filter(p=>p.rankDelta!==null&&p.rankDelta>=10).slice(0,2).forEach(p=>{
+      if(!recs.find(r=>r.player.id===p.id))recs.push({label:'📈 KTC Higher',player:p,
+        reason:`FC #${p.fcRank} vs KTC #${p.ktcRank} (+${p.rankDelta} spots)${p.posRankDelta?` · ${p.position}${p.fcPosRank}→${p.position}${p.ktcPosRank}`:''} — crowd values higher than algo`});
+    });
+    ba.filter(p=>p.rankDelta!==null&&p.rankDelta<=-10).slice(0,2).forEach(p=>{
+      if(!recs.find(r=>r.player.id===p.id))recs.push({label:'📉 KTC Lower',player:p,
+        reason:`FC #${p.fcRank} vs KTC #${p.ktcRank} (${p.rankDelta} spots)${p.posRankDelta?` · ${p.position}${p.fcPosRank}→${p.position}${p.ktcPosRank}`:''} — algo values higher than crowd`});
+    });
+  }
+  return recs.slice(0,7);
+}
+
+function getOwnerName(uid){const found=S.users.find(x=>x.user_id===uid);return found?.metadata?.team_name||found?.display_name||found?.username||'Unknown';}
+
+// ── Polling ──
+let pollTimer=null;
+function startPolling(){stopPolling();pollDraft();pollTimer=setInterval(pollDraft,10000);}
+function stopPolling(){if(pollTimer){clearInterval(pollTimer);pollTimer=null;}}
+async function pollDraft(){
+  try{
+    const[draft,picks]=await Promise.all([getDraft(S.draftId),getDraftPicks(S.draftId)]);
+    S.draft=draft;S.picks=picks;
+    const li=document.getElementById('liveIndicator'),lt=document.getElementById('liveText');
+    if(li&&lt){const live=draft.status==='drafting';li.className=live?'hdr-live':'hdr-live off';
+      lt.textContent=live?`LIVE · ${picks.length}`:draft.status==='complete'?'Complete':'Pre-draft';}
+    if(picks.length!==S.lastPollCount){S.lastPollCount=picks.length;render();}
+  }catch(e){console.error('Poll:',e);}
+}
+
+function updatePills(){
+  const el=document.getElementById('srcPills');if(!el)return;
+  el.innerHTML=['fc','ktc','csv'].map(k=>{
+    const s=S.sources[k];const st=s.status;
+    const cls=st==='live'||st==='csv'?'on':st==='loading'?'loading':'off';
+    const label=k==='csv'&&s.name?s.name:s.label;
+    const txt=st==='live'?'✓':st==='loading'?'…':st==='unavailable'?'—':st==='error'||st==='parse-error'?'✕':st==='idle'?'':'';
+    return`<span class="src-pill ${cls}">${label} ${txt}</span>`;
+  }).join('');
+}
+
+// ── Rendering ──
+function render(){
+  const app=document.getElementById('app');
+  try{
+    if(S.view==='setup')app.innerHTML=renderSetup();
+    else if(S.view==='loading')app.innerHTML=renderLoading();
+    else if(S.view==='draftSelect')app.innerHTML=renderDraftSelect();
+    else if(S.view==='room')app.innerHTML=renderRoom();
+    if(S.modal)app.innerHTML+=renderModal();
+  }catch(e){
+    console.error('Render error:',e);
+    app.innerHTML=`<div style="padding:40px;color:#f85149;font-family:monospace"><h3>Render Error</h3><pre>${e.message}\n${e.stack}</pre></div>`;
+  }
+  bindEvents();updatePills();
+}
+
+function renderSetup(){
+  return`<div class="setup">
+    <h1>Draft Commander</h1>
+    <p>Connect to a live Sleeper draft for real-time BPA recommendations, multi-source value tracking, and pick-by-pick analysis.</p>
+    <div class="setup-form">
+      <div class="setup-row"><input id="draftIdInput" placeholder="Sleeper Draft ID" value="${S.draftId}"/></div>
+      <div class="setup-row"><input id="usernameInput" placeholder="Your Sleeper username" value="${S.username}"/></div>
+      <button class="btn" id="connectBtn" style="width:100%">Connect to Draft</button>
+    </div>
+    ${S.error?`<div class="err">${S.error}</div>`:''}
+    <div class="hint">Find your Draft ID in the Sleeper app URL, or enter your username to see all your drafts.</div>
+    ${S.sources.ktc.status==='live'||S.sources.csv.status==='live'?`<div style="margin-top:14px;display:flex;gap:6px;justify-content:center;flex-wrap:wrap">
+      ${S.sources.ktc.status==='live'?`<span class="src-pill on" style="font-size:10px">KTC: ${Object.keys(S.sources.ktc.data).length} players cached</span>`:''}
+      ${S.sources.csv.status==='live'?`<span class="src-pill on" style="font-size:10px;border-color:var(--csv-color);color:var(--csv-color)">${S.sources.csv.name}: ${Object.keys(S.sources.csv.data).length} players cached</span>`:''}
+    </div>`:''}
+  </div>`;
+}
+
+function renderLoading(){return`<div class="loading"><div class="spin"></div><span>${S.loadingMsg||'Connecting...'}</span></div>`;}
+
+function renderDraftSelect(){
+  const drafts=S.draftList;
+  // Group by year
+  const byYear={};
+  drafts.forEach(d=>{
+    const yr=d.year||'Unknown';
+    if(!byYear[yr])byYear[yr]=[];
+    byYear[yr].push(d);
+  });
+  // Sort years descending
+  const years=Object.keys(byYear).sort((a,b)=>b-a);
+  // Sort within each year: drafting first, then pre_draft, then complete
+  const statusOrder={drafting:0,pre_draft:1,complete:2};
+  years.forEach(yr=>{byYear[yr].sort((a,b)=>(statusOrder[a.draft.status]||3)-(statusOrder[b.draft.status]||3));});
+  
+  return`<div class="draft-select">
+    <span class="back-link" id="backToSetup">← Back</span>
+    <h2>Select a Draft</h2>
+    <div class="sub">${drafts.length} draft${drafts.length!==1?'s':''} found for ${S.username}</div>
+    ${years.map(yr=>`
+      <div class="draft-year-hdr">${yr} Season</div>
+      <div class="draft-grid">
+        ${byYear[yr].map(d=>{
+          const dr=d.draft;const st=dr.status;
+          const teams=dr.settings?.teams||12;const rounds=dr.settings?.rounds||20;
+          const totalPicks=teams*rounds;
+          const picksMade=d.pickCount||0;
+          const pct=totalPicks>0?Math.round((picksMade/totalPicks)*100):0;
+          const rp=d.leagueRosterPositions||dr.settings?.roster_positions||[];
+          const isSF=rp.some(p=>p==='SUPER_FLEX');
+          const isTEP=d.leagueScoringTep||false;
+          const isDyn=dr.type==='snake'||dr.type==='linear'||dr.type==='snake_devy';
+          const draftType=dr.type==='snake'?'Snake':dr.type==='linear'?'Linear':dr.type==='snake_devy'?'Snake Devy':dr.type||'?';
+          const leagueName=d.leagueName||'League';
+          
+          return`<div class="draft-card ${st==='drafting'?'live':''}" data-draft-id="${dr.draft_id}">
+            <div class="dc-top">
+              <span class="dc-name">${leagueName}</span>
+              <span class="dc-status ${st}">${st==='drafting'?'● LIVE':st==='pre_draft'?'Pre-Draft':st==='complete'?'Complete':st}</span>
+            </div>
+            <div class="dc-meta">
+              <span>${teams} teams</span>
+              <span>${draftType}</span>
+              <span>${rounds} rounds</span>
+              ${picksMade>0?`<span>${picksMade}/${totalPicks} picks</span>`:''}
+            </div>
+            <div class="dc-tags">
+              ${isSF?'<span class="dc-tag sf">Superflex</span>':'<span class="dc-tag">1QB</span>'}
+              ${isTEP?'<span class="dc-tag tep">TEP</span>':''}
+              ${isDyn?'<span class="dc-tag dyn">Dynasty</span>':''}
+            </div>
+            ${picksMade>0?`<div class="dc-progress"><div class="dc-progress-bar" style="width:${pct}%"></div></div>`:''}
+          </div>`;
+        }).join('')}
+      </div>
+    `).join('')}
+  </div>`;
+}
+
+function renderRoom(){
+  if(!S.draft)return renderLoading();
+  const teams=S.draft.settings?.teams||12,total=S.picks.length;
+  const cR=Math.floor(total/teams)+1,cP=(total%teams)+1;
+  const next=getNextPick(),until=getPicksUntil(),myP=getMyPicks();
+  const ba=getBestAvailable(S.posFilter==='ALL'?null:S.posFilter);
+  const recs=getRecommendations();
+  const recent=[...S.picks].reverse().slice(0,15);
+
+  return`<div class="room">
+    <div class="room-top">
+      <div>
+        <div class="pick-clock">Rd ${cR} · Pick ${cP}</div>
+        <div class="pick-info">${until!==null?(until===0?`<strong style="color:var(--accent)">YOU'RE ON THE CLOCK</strong>`:`<strong>${until}</strong> picks until yours (${next?`Rd ${next.round}.${String(next.pick).padStart(2,'0')}`:''})`):'All picks in'}</div>
+      </div>
+      <div class="my-picks">${myP.slice(0,10).map(p=>{const used=p.overall<=total;const isN=next&&p.overall===next.overall;
+        return`<span class="my-pick ${used?'used':''} ${isN?'next':''}">${p.round}.${String(p.pick).padStart(2,'0')}</span>`;}).join('')}</div>
+      <div class="draft-meta">
+        <div class="room-tabs">
+          <button class="room-tab ${S.roomTab==='board'?'active':''}" data-rtab="board">Board</button>
+          <button class="room-tab ${S.roomTab==='chart'?'active':''}" data-rtab="chart">Chart</button>
+          <button class="room-tab ${S.roomTab==='trade'?'active':''}" data-rtab="trade">Trade</button>
+          <button class="room-tab ${S.roomTab==='opponents'?'active':''}" data-rtab="opponents">Opponents</button>
+          <button class="room-tab ${S.roomTab==='scarcity'?'active':''}" data-rtab="scarcity">Scarcity</button>
+          <button class="room-tab ${S.roomTab==='sources'?'active':''}" data-rtab="sources">Sources</button>
+        </div>
+        <span>${teams}T · ${S.draft.type}</span>
+        <span>${total}/${teams*(S.draft.settings?.rounds||20)}</span>
+        <button class="refresh-btn" id="refreshBtn">↻</button>
+      </div>
+    </div>
+
+    ${S.roomTab==='board'?renderBoard(ba,recs,teams,recent):
+      S.roomTab==='chart'?`<div class="chart-panel">${renderValueChart(teams)}</div>`:
+      S.roomTab==='trade'?`<div class="chart-panel">${renderTradeEvalEnhanced(teams)}</div>`:
+      S.roomTab==='opponents'?`<div class="chart-panel">${renderOpponentProfiles()}</div>`:
+      S.roomTab==='scarcity'?`<div class="chart-panel">${renderScarcitySim()}</div>`:
+      `<div class="chart-panel">${renderSourcesPanel()}</div>`}
+
+    <div class="sidebar">
+      <div class="sb-section">
+        <div class="sb-title">⚡ Recommendations</div>
+        ${(()=>{const runs=detectRuns(5);return runs.length?runs.map(r=>`<div class="run-alert">
+          <div class="run-title">🔥 ${r.pos} RUN — ${r.count} in last ${r.lookback} picks</div>
+          <div class="run-detail">${r.players.join(', ')}<br>${r.remaining} ${r.pos}s left · Best: ${r.nextBest}${r.tier1Left>0?` · ${r.tier1Left} in top 30`:''}</div>
+        </div>`).join(''):'';})()}
+        ${(()=>{const tbs=getTradeBackOpportunities();return tbs.length?tbs.map(tb=>{
+          if(tb.type==='flat-tier')return`<div class="tb-alert">
+            <div class="tb-title">↕ FLAT TIER — ${tb.tierSize} players</div>
+            <div class="tb-detail">Next ${tb.tierSize} available (${tb.tierPositions}) are in the same tier. ${tb.bestInTier} through ${tb.worstInTier}.</div>
+            <div class="tb-offer">${tb.suggestion}</div>
+          </div>`;
+          if(tb.type==='cliff-warning')return`<div class="run-alert">
+            <div class="run-title">⚡ CLIFF AHEAD — ${tb.cliffSize} rank drop</div>
+            <div class="run-detail">${tb.msg}</div>
+          </div>`;
+          return'';
+        }).join(''):'';})()}
+        ${recs.length?recs.map(r=>`<div class="sb-rec">
+          <div class="label">${r.label}</div>
+          <div class="player"><span class="p-pos p-${r.player.position}" style="margin-right:6px">${r.player.position}</span>${r.player.name}</div>
+          <div class="reason">${r.reason}</div>
+        </div>`).join(''):'<div style="font-size:12px;color:var(--text3)">Waiting for data...</div>'}
+      </div>
+      <div class="sb-section">
+        <div class="sb-title">📋 Recent Picks</div>
+        <div class="draft-log">${recent.map(p=>{const info=resolvePlayer(p.player_id);const pn=p.pick_no;const r=Math.ceil(pn/teams),ip=((pn-1)%teams)+1;const isPP=info?.isRookiePick;
+          return`<div class="log-row"><span class="log-pick">${r}.${String(ip).padStart(2,'0')}</span><span class="p-pos p-${isPP?'PICK':(info?.position||'?')}" style="font-size:9px">${isPP?'PICK':(info?.position||'?')}</span><span class="log-name" ${isPP?'style="color:var(--pick)"':''}>${info?.name||p.player_id}</span><span class="log-owner">${getOwnerName(p.picked_by)}</span></div>`;}).join('')}</div>
+      </div>
+      <div class="sb-section">
+        <div class="sb-title">📊 Scarcity</div>
+        ${['QB','RB','WR','TE'].map(pos=>{const a=getBestAvailable(pos);const gap=a.length>5?(a[5].compositeRank-a[0].compositeRank):0;
+          return`<div style="display:flex;align-items:center;gap:6px;padding:3px 0;border-bottom:1px solid var(--border)">
+            <span class="p-pos p-${pos}">${pos}</span><span style="font-size:10px;flex:1">${a[0]?.name||'—'}</span>
+            <span style="font-size:9px;color:var(--text3)" class="mono">${a.length} left</span>
+            ${gap>40?`<span style="font-size:9px;color:var(--danger)" class="mono">⚠ cliff</span>`:''}
+          </div>`;}).join('')}
+      </div>
+    </div>
+  </div>`;
+}
+
+function renderBoard(ba,recs,teams,recent){
+  const hasKtc=S.sources.ktc.status==='live';
+  return`<div class="board-panel">
+    <div class="section-hdr">Best Available${ba.length?` (${ba.length})`:''}</div>
+    <div class="pos-filters">
+      ${['ALL','QB','RB','WR','TE'].map(p=>`<button class="pos-filter ${S.posFilter===p?'active':''}" data-pos="${p}">${p}</button>`).join('')}
+      <span style="flex:1"></span>
+      <button class="pos-filter ${S.showRookies?'active':''}" id="rookieToggle" style="${S.showRookies?'color:var(--accent);':''}">👶 ${S.showRookies?'ON':'OFF'}</button>
+    </div>
+    <div style="display:flex;padding:4px 14px;border-bottom:1px solid var(--border);font-size:9px;color:var(--text3);font-family:'IBM Plex Mono',monospace">
+      <span style="width:30px">RK</span><span style="width:26px"></span><span style="flex:1">PLAYER</span><span style="width:28px">TM</span>
+      <span style="width:36px;text-align:right;color:var(--fc-color)">FC</span>
+      ${hasKtc?'<span style="width:36px;text-align:right;color:var(--ktc-color)">KTC</span><span style="width:50px;text-align:center">Δ RNK</span><span style="width:58px;text-align:center">Δ POS</span>':''}
+    </div>
+    ${ba.slice(0,100).map((p,idx)=>{const isRec=recs.some(r=>r.player.id===p.id);
+      const dvg=p.divergence;const dvgCls=dvg==='high'?'divergent':dvg==='medium'?'divergent':'';
+      // Rank delta display
+      let rankDeltaHtml='';let posRankDeltaHtml='';
+      if(hasKtc&&p.ktcRank){
+        const rd=p.rankDelta;const color=rd>0?'var(--live)':rd<0?'var(--danger)':'var(--text3)';
+        const arrow=rd>0?'↑':rd<0?'↓':'';
+        rankDeltaHtml=`<span style="width:50px;text-align:center;font-family:'IBM Plex Mono',monospace;font-size:10px;color:${color}">${rd>0?'+':''}${rd} ${arrow}</span>`;
+        
+        if(p.posRankDelta!==null){
+          const pd=p.posRankDelta;const pColor=pd>0?'var(--live)':pd<0?'var(--danger)':'var(--text3)';
+          posRankDeltaHtml=`<span style="width:58px;text-align:center;font-size:10px;color:${pColor}"><span style="color:var(--fc-color)">${p.position}${p.fcPosRank}</span><span style="color:var(--text3)">→</span><span style="color:var(--ktc-color)">${p.position}${p.ktcPosRank}</span></span>`;
+        }else{
+          posRankDeltaHtml='<span style="width:58px"></span>';
+        }
+      }else if(hasKtc){
+        rankDeltaHtml='<span style="width:50px;text-align:center;font-size:10px;color:var(--text3)">—</span>';
+        posRankDeltaHtml='<span style="width:58px"></span>';
+      }
+      
+      return`<div class="p-row ${isRec?'recommended':''} ${dvgCls}">
+        <span class="p-rank">${p.compositeRank}</span>
+        <span class="p-pos p-${p.position}">${p.position}</span>
+        <span class="p-name">${p.name}</span>
+        <span class="p-team">${p.team||''}</span>
+        <span class="p-val fc" style="width:36px">#${p.fcRank}</span>
+        ${hasKtc?`<span class="p-val ktc" style="width:36px">${p.ktcRank?'#'+p.ktcRank:'—'}</span>${rankDeltaHtml}${posRankDeltaHtml}`:''}
+      </div>`;}).join('')}
+  </div>`;
+}
+
+function renderSourcesPanel(){
+  const stats={};
+  ['fc','ktc','csv'].forEach(k=>{
+    const s=S.sources[k];
+    const count=Object.keys(s.data).filter(x=>!x.startsWith('n:')).length;
+    stats[k]={count,status:s.status,weight:s.weight};
+  });
+  // Count matched players (in FC that also have KTC)
+  let matched=0,divergent=0;
+  if(S.sources.fc.status==='live'&&S.sources.ktc.status==='live'){
+    Object.entries(S.sources.fc.data).forEach(([k,p])=>{
+      if(k.startsWith('n:'))return;
+      const analysis=getPlayerAnalysis(p.name,p.sleeperId||k,p);
+      if(analysis.ktcRank!==null){matched++;
+        if(analysis.divergence==='high'||analysis.divergence==='medium')divergent++;
+      }
+    });
+  }
+
+  return`<div style="padding:16px">
+    <div class="section-hdr" style="background:transparent;padding:0 0 10px">Data Sources & Weights</div>
+    ${['fc','ktc','csv'].map(k=>{const s=S.sources[k];const st=stats[k];
+      return`<div class="weight-row">
+        <span class="weight-row src-label" style="color:${s.color}">${k==='csv'&&s.name?s.name:s.label}</span>
+        <span class="weight-row src-status" style="color:${st.status==='live'?'var(--live)':st.status==='error'||st.status==='unavailable'?'var(--danger)':'var(--text3)'}">${st.status==='live'?`${st.count}`:st.status}</span>
+        <input type="range" min="0" max="100" value="${s.weight}" data-src="${k}" class="weight-slider"/>
+        <span class="weight-row src-pct">${s.weight}%</span>
+      </div>`;}).join('')}
+    <div style="font-size:10px;color:var(--text3);margin:12px 0 16px">Weights auto-normalize. Drag to adjust source influence on composite rankings.</div>
+
+    <div style="display:flex;gap:8px;margin-bottom:16px">
+      <button class="btn btn-sm btn-ghost" id="pasteKtcBtn">${S.sources.ktc.status==='live'?'✓ KTC Loaded':'Paste KTC Data'}</button>
+      <button class="btn btn-sm btn-ghost" id="uploadCsvBtn">Upload CSV</button>
+      <input type="file" id="csvFileInput" accept=".csv,.txt" style="display:none"/>
+    </div>
+
+    ${matched>0?`<div style="background:var(--surface2);border-radius:6px;padding:12px;margin-bottom:12px">
+      <div style="font-size:12px;font-weight:600;margin-bottom:4px">Cross-Source Analysis</div>
+      <div style="font-size:11px;color:var(--text2);line-height:1.7">
+        <strong style="color:var(--text)">${matched}</strong> players matched across FC + KTC<br>
+        <strong style="color:${divergent>0?'var(--danger)':'var(--live)'}">${divergent}</strong> with >20% value divergence
+      </div>
+    </div>`:''}
+
+    ${S.sources.ktc.status==='unavailable'?`<div style="background:var(--surface2);border:1px solid var(--border);border-radius:6px;padding:12px;margin-bottom:12px">
+      <div style="font-size:11px;color:var(--accent2);margin-bottom:6px">⚠ KTC scrape blocked by CORS</div>
+      <div style="font-size:11px;color:var(--text2);line-height:1.6">Open <a href="https://keeptradecut.com/dynasty-rankings" target="_blank" style="color:var(--ktc-color)">keeptradecut.com/dynasty-rankings</a>, select all (Ctrl+A), copy (Ctrl+C), then click "Paste KTC Data" above.</div>
+    </div>`:''}
+  </div>`;
+}
+
+function renderValueChart(numTeams){
+  if(!S.picks.length)return'<div style="padding:40px;text-align:center;color:var(--text3)">No picks yet.</div>';
+  const posC={QB:'#f85149',RB:'#58a6ff',WR:'#3fb950',TE:'#bc8cff',PICK:'#d29922'};
+  const pickData=S.picks.map((pick,i)=>{const info=resolvePlayer(pick.player_id);const pn=i+1;
+    const analysis=info?getPlayerAnalysis(info.name,info.id,info):null;
+    const r=Math.ceil(pn/numTeams),ip=((pn-1)%numTeams)+1;
+    return{pickNum:pn,round:r,inRound:ip,value:analysis?.sortValue||info?.value||0,isMine:pick.picked_by===S.userId,
+      isPickProxy:info?.isRookiePick,name:info?.name||'?',position:info?.isRookiePick?'PICK':(info?.position||'?'),
+      rank:info?.rank||999,diff:info?.rank?(pn-info.rank):0,owner:getOwnerName(pick.picked_by)};
+  });
+  const allFC=Object.entries(S.sources.fc.data).filter(([k])=>!k.startsWith('n:')).map(([,p])=>p).filter(p=>['QB','RB','WR','TE'].includes(p.position)).sort((a,b)=>(b.value||0)-(a.value||0));
+  const expAt=n=>allFC[n-1]?.value||0;
+  const W=900,H=360,P={t:20,r:20,b:40,l:60};const cw=W-P.l-P.r,ch=H-P.t-P.b;
+  const mxP=pickData.length,mxV=Math.max(...pickData.map(p=>p.value),...pickData.map((_,i)=>expAt(i+1)),1);
+  const x=p=>P.l+((p-1)/Math.max(mxP-1,1))*cw,y=v=>P.t+ch-(v/mxV)*ch;
+  const expLine=pickData.map((_,i)=>`${x(i+1)},${y(expAt(i+1))}`).join(' ');
+  const rLines=[];for(let r=1;r<=Math.ceil(mxP/numTeams);r++){const p=r*numTeams;if(p<mxP){rLines.push(`<line x1="${x(p+.5)}" y1="${P.t}" x2="${x(p+.5)}" y2="${H-P.b}" stroke="var(--border)" stroke-dasharray="3,3"/><text x="${x(p+.5)}" y="${H-P.b+14}" fill="var(--text3)" font-size="9" text-anchor="middle" font-family="IBM Plex Mono">R${r+1}</text>`);}}
+  const yL=[];for(let v=0;v<=mxV;v+=Math.ceil(mxV/5/1000)*1000){if(!v)continue;yL.push(`<text x="${P.l-8}" y="${y(v)+3}" fill="var(--text3)" font-size="9" text-anchor="end" font-family="IBM Plex Mono">${(v/1000).toFixed(0)}k</text><line x1="${P.l}" y1="${y(v)}" x2="${W-P.r}" y2="${y(v)}" stroke="var(--border)" stroke-width="0.5"/>`)}
+  const dots=pickData.map(p=>{const cx=x(p.pickNum),cy=y(p.value),c=posC[p.position]||'#8b949e',r=p.isMine?6:4;
+    return`<circle cx="${cx}" cy="${cy}" r="${r}" fill="${c}" stroke="${p.isMine?'var(--accent)':'none'}" stroke-width="${p.isMine?2:0}" opacity="${p.isPickProxy?.4:1}"><title>${p.pickNum}. ${p.name} (${p.value.toLocaleString()})${p.isMine?' ★':''}</title></circle>`;});
+  const myP=pickData.filter(p=>p.isMine);const myTV=myP.reduce((s,p)=>s+p.value,0);
+  const myAD=myP.length?myP.reduce((s,p)=>s+p.diff,0)/myP.length:0;
+  const steal=myP.length?myP.reduce((b,p)=>p.diff>b.diff?p:b,myP[0]):null;
+  return`<div class="section-hdr" style="background:transparent;padding:0 0 10px">Draft Value Chart</div>
+    <svg viewBox="0 0 ${W} ${H}" style="width:100%;max-height:400px">${yL.join('')}${rLines.join('')}<polyline points="${expLine}" fill="none" stroke="var(--text3)" stroke-width="1.5" stroke-dasharray="4,4" opacity="0.5"/>${dots.join('')}<line x1="${P.l}" y1="${H-P.b}" x2="${W-P.r}" y2="${H-P.b}" stroke="var(--border)"/><line x1="${P.l}" y1="${P.t}" x2="${P.l}" y2="${H-P.b}" stroke="var(--border)"/><text x="${P.l}" y="${H-P.b+14}" fill="var(--text3)" font-size="9" font-family="IBM Plex Mono">R1</text></svg>
+    <div class="chart-legend"><span class="chart-legend-item"><span class="chart-legend-dot" style="background:var(--qb)"></span>QB</span><span class="chart-legend-item"><span class="chart-legend-dot" style="background:var(--rb)"></span>RB</span><span class="chart-legend-item"><span class="chart-legend-dot" style="background:var(--wr)"></span>WR</span><span class="chart-legend-item"><span class="chart-legend-dot" style="background:var(--te)"></span>TE</span><span class="chart-legend-item"><span class="chart-legend-dot" style="background:var(--pick)"></span>PICK</span><span class="chart-legend-item"><span class="chart-legend-dot" style="background:var(--accent);border:2px solid var(--accent)"></span>Yours</span><span class="chart-legend-item" style="color:var(--text3)">--- Expected</span></div>
+    ${myP.length?`<div class="chart-stats"><div class="chart-stat"><div class="num" style="color:var(--accent)">${myTV.toLocaleString()}</div><div class="lbl">Your Total Value</div></div><div class="chart-stat"><div class="num" style="color:${myAD>=0?'var(--live)':'var(--danger)'}">${myAD>=0?'+':''}${myAD.toFixed(1)}</div><div class="lbl">Avg vs ADP</div></div><div class="chart-stat"><div class="num" style="color:var(--live)">${steal?steal.name.split(' ').pop():'—'}</div><div class="lbl">Best Steal${steal?' (+'+steal.diff+')':''}</div></div></div>
+    <div class="section-hdr" style="background:transparent;padding:14px 0 6px;border:none">Your Picks</div>
+    <div class="pick-detail"><div class="pick-detail-hdr">Pick</div><div class="pick-detail-hdr">Player</div><div class="pick-detail-hdr">Value</div><div class="pick-detail-hdr">vs ADP</div>
+    ${myP.map(p=>`<div class="pick-detail-cell">${p.round}.${String(p.inRound).padStart(2,'0')}</div><div class="pick-detail-cell"><span class="p-pos p-${p.position}" style="font-size:9px;margin-right:4px">${p.position}</span>${p.name}</div><div class="pick-detail-cell" style="font-family:'IBM Plex Mono',monospace">${p.value.toLocaleString()}</div><div class="pick-detail-cell ${p.diff>5?'steal':p.diff<-5?'reach':''}" style="font-family:'IBM Plex Mono',monospace">${p.diff>0?'+':''}${p.diff} ${p.diff>5?'🟢':p.diff<-5?'🔴':'⚪'}</div>`).join('')}</div>`:'<div style="padding:20px;text-align:center;color:var(--text3)">Your picks appear here.</div>'}`;
+}
+
+// ── Enhanced Trade Evaluator (with future picks) ──
+function renderTradeEvalEnhanced(numTeams){
+  const t=S.trade;
+  const hasData=t.send.length>0&&t.receive.length>0;
+  const eval_=hasData?evaluateTradeEnhanced(t.send,t.receive,numTeams):null;
+  
+  const futurePickExamples=['2027 1st','2027 early 1st','2027 mid 2nd','2026 late 1st','2028 1st'];
+  
+  return`<div style="padding:16px">
+    <div class="section-hdr" style="background:transparent;padding:0 0 10px">Mid-Draft Trade Evaluator</div>
+    <div style="font-size:11px;color:var(--text2);margin-bottom:10px;line-height:1.6">Startup picks: <span class="mono" style="color:var(--text)">3.05</span> or overall <span class="mono" style="color:var(--text)">29</span>. Future picks: <span class="mono" style="color:var(--pick)">2027 1st</span>, <span class="mono" style="color:var(--pick)">2027 early 1st</span>, <span class="mono" style="color:var(--pick)">2026 mid 2nd</span></div>
+    
+    <div style="margin-bottom:12px">
+      <div style="font-size:10px;color:var(--text3);margin-bottom:4px">Quick add future picks:</div>
+      <div style="display:flex;flex-wrap:wrap;gap:3px">${futurePickExamples.map(fp=>`<span class="fpick-chip" data-fp-send="${fp}">${fp} →Send</span><span class="fpick-chip" data-fp-recv="${fp}" style="border-color:rgba(63,185,80,.3);color:var(--live)">${fp} →Recv</span>`).join('')}</div>
+    </div>
+    
+    <div style="display:flex;gap:14px;margin-bottom:14px">
+      <div class="trade-side">
+        <h4 style="color:var(--danger)">You Send</h4>
+        <div class="trade-input">
+          <input id="tradeSendInput" placeholder="e.g., 3.05 or 2027 1st" value="${t.sendInput}"/>
+          <button class="btn btn-sm" id="tradeSendAdd">Add</button>
+        </div>
+        <div>${t.send.map((item,i)=>{
+          const fp=getFuturePickValue(item);
+          if(fp)return`<div class="trade-chip" style="border-color:rgba(210,153,34,.3)"><span style="color:var(--pick)">${fp.label}</span><span style="color:var(--text3);font-size:9px">(${fp.value.toLocaleString()})</span><span class="x" data-trade-rm="send-${i}">✕</span></div>`;
+          const overall=parsePick(item,numTeams);const r=overall?Math.ceil(overall/numTeams):0;const ip=overall?((overall-1)%numTeams)+1:0;
+          const exp=overall?getExpectedPlayerAtPick(overall):null;
+          return`<div class="trade-chip"><span class="mono">${r}.${String(ip).padStart(2,'0')}</span>${exp?` <span style="color:var(--text3)">≈ ${exp.name}</span>`:''}<span class="x" data-trade-rm="send-${i}">✕</span></div>`;
+        }).join('')}</div>
+      </div>
+      <div style="display:flex;align-items:center;font-size:20px;color:var(--accent)">⇄</div>
+      <div class="trade-side">
+        <h4 style="color:var(--live)">You Receive</h4>
+        <div class="trade-input">
+          <input id="tradeReceiveInput" placeholder="e.g., 5.10 or 2027 2nd" value="${t.receiveInput}"/>
+          <button class="btn btn-sm" id="tradeReceiveAdd">Add</button>
+        </div>
+        <div>${t.receive.map((item,i)=>{
+          const fp=getFuturePickValue(item);
+          if(fp)return`<div class="trade-chip" style="border-color:rgba(210,153,34,.3)"><span style="color:var(--pick)">${fp.label}</span><span style="color:var(--text3);font-size:9px">(${fp.value.toLocaleString()})</span><span class="x" data-trade-rm="receive-${i}">✕</span></div>`;
+          const overall=parsePick(item,numTeams);const r=overall?Math.ceil(overall/numTeams):0;const ip=overall?((overall-1)%numTeams)+1:0;
+          const exp=overall?getExpectedPlayerAtPick(overall):null;
+          return`<div class="trade-chip"><span class="mono">${r}.${String(ip).padStart(2,'0')}</span>${exp?` <span style="color:var(--text3)">≈ ${exp.name}</span>`:''}<span class="x" data-trade-rm="receive-${i}">✕</span></div>`;
+        }).join('')}</div>
+      </div>
+    </div>
+    
+    ${hasData?`<button class="btn btn-sm btn-ghost" id="tradeClearBtn" style="margin-bottom:14px">Clear Trade</button>`:''}
+    
+    ${eval_?`<div class="trade-verdict">
+      <div class="result" style="color:${eval_.verdict==='win'?'var(--live)':eval_.verdict==='lose'?'var(--danger)':'var(--text)'}">
+        ${eval_.verdict==='win'?'✓ You Win':''}${eval_.verdict==='lose'?'✕ You Lose':''}${eval_.verdict==='even'?'≈ Even':''}
+        <span style="font-size:14px;font-weight:400;color:var(--text2);margin-left:8px">${eval_.delta>0?'+':''}${Math.round(eval_.delta).toLocaleString()} value</span>
+      </div>
+      <div class="detail">
+        Send: ${Math.round(eval_.sendTotal).toLocaleString()} total value · Receive: ${Math.round(eval_.receiveTotal).toLocaleString()} total value
+        ${Math.abs(eval_.pctDiff)>2?` · ${eval_.pctDiff>0?'+':''}${eval_.pctDiff.toFixed(1)}%`:''}
+      </div>
+    </div>
+    
+    <div style="display:flex;gap:14px;margin-top:14px">
+      <div style="flex:1">
+        <div style="font-size:10px;color:var(--text3);text-transform:uppercase;letter-spacing:1px;margin-bottom:6px" class="mono">You send</div>
+        ${eval_.sendDetails.map(v=>v.type==='future'?
+          `<div style="display:flex;align-items:center;gap:6px;padding:4px 0;border-bottom:1px solid var(--border);font-size:11px">
+            <span class="p-pos p-PICK" style="font-size:9px">PICK</span>
+            <span style="flex:1;color:var(--pick)">${v.label}</span>
+            <span class="mono" style="color:var(--text3)">${v.value.toLocaleString()}</span>
+          </div>`:
+          `<div style="display:flex;align-items:center;gap:6px;padding:4px 0;border-bottom:1px solid var(--border);font-size:11px">
+            <span class="mono" style="color:var(--text3);width:36px">${v.pick}</span>
+            <span class="p-pos p-${v.pos}" style="font-size:9px">${v.pos}</span>
+            <span style="flex:1">${v.player}</span>
+            <span class="mono" style="color:var(--text3)">${Math.round(v.value).toLocaleString()}</span>
+          </div>`
+        ).join('')}
+      </div>
+      <div style="flex:1">
+        <div style="font-size:10px;color:var(--text3);text-transform:uppercase;letter-spacing:1px;margin-bottom:6px" class="mono">You receive</div>
+        ${eval_.receiveDetails.map(v=>v.type==='future'?
+          `<div style="display:flex;align-items:center;gap:6px;padding:4px 0;border-bottom:1px solid var(--border);font-size:11px">
+            <span class="p-pos p-PICK" style="font-size:9px">PICK</span>
+            <span style="flex:1;color:var(--pick)">${v.label}</span>
+            <span class="mono" style="color:var(--text3)">${v.value.toLocaleString()}</span>
+          </div>`:
+          `<div style="display:flex;align-items:center;gap:6px;padding:4px 0;border-bottom:1px solid var(--border);font-size:11px">
+            <span class="mono" style="color:var(--text3);width:36px">${v.pick}</span>
+            <span class="p-pos p-${v.pos}" style="font-size:9px">${v.pos}</span>
+            <span style="flex:1">${v.player}</span>
+            <span class="mono" style="color:var(--text3)">${Math.round(v.value).toLocaleString()}</span>
+          </div>`
+        ).join('')}
+      </div>
+    </div>`:'<div style="text-align:center;padding:30px;color:var(--text3);font-size:12px">Add picks to both sides to see the evaluation.</div>'}
+  </div>`;
+}
+
+// ── Old trade eval kept for backwards compat ──
+function parsePick(text,numTeams){
+  // Parse "3.05" or "3.5" or "29" (overall) into overall pick number
+  text=text.trim();
+  const dotMatch=text.match(/^(\d+)\.(\d+)$/);
+  if(dotMatch){const r=parseInt(dotMatch[1]),p=parseInt(dotMatch[2]);return(r-1)*numTeams+p;}
+  const num=parseInt(text);
+  if(!isNaN(num)&&num>0)return num;
+  return null;
+}
+
+function getExpectedPlayerAtPick(overallPick){
+  // Get the BPA list and find what player would likely be available at this pick
+  const ba=getBestAvailable(null);
+  // Account for picks already made: pick N in the future = ba[N - currentPick - 1]
+  const currentPick=S.picks.length;
+  const idx=overallPick-currentPick-1;
+  if(idx>=0&&idx<ba.length)return ba[idx];
+  if(idx<0)return{name:'Already picked',compositeRank:999,position:'?'};
+  return null;
+}
+
+function evaluateTrade(sendPicks,receivePicks,numTeams){
+  const sendValues=sendPicks.map(p=>{
+    const overall=parsePick(p,numTeams);if(!overall)return null;
+    const player=getExpectedPlayerAtPick(overall);
+    const r=Math.ceil(overall/numTeams),ip=((overall-1)%numTeams)+1;
+    return{pick:p,overall,round:r,inRound:ip,player,rank:player?.compositeRank||999,name:player?.name||'Unknown',pos:player?.position||'?'};
+  }).filter(Boolean);
+  
+  const receiveValues=receivePicks.map(p=>{
+    const overall=parsePick(p,numTeams);if(!overall)return null;
+    const player=getExpectedPlayerAtPick(overall);
+    const r=Math.ceil(overall/numTeams),ip=((overall-1)%numTeams)+1;
+    return{pick:p,overall,round:r,inRound:ip,player,rank:player?.compositeRank||999,name:player?.name||'Unknown',pos:player?.position||'?'};
+  }).filter(Boolean);
+  
+  // Compare by average rank of expected players
+  const sendAvgRank=sendValues.length?sendValues.reduce((s,v)=>s+v.rank,0)/sendValues.length:999;
+  const receiveAvgRank=receiveValues.length?receiveValues.reduce((s,v)=>s+v.rank,0)/receiveValues.length:999;
+  const bestSendRank=Math.min(...sendValues.map(v=>v.rank));
+  const bestReceiveRank=Math.min(...receiveValues.map(v=>v.rank));
+  
+  return{sendValues,receiveValues,sendAvgRank,receiveAvgRank,bestSendRank,bestReceiveRank,
+    verdict:receiveAvgRank<sendAvgRank?'win':receiveAvgRank>sendAvgRank?'lose':'even',
+    delta:Math.round(sendAvgRank-receiveAvgRank)};
+}
+
+function renderTradeEval(numTeams){
+  const t=S.trade;
+  const hasData=t.send.length>0&&t.receive.length>0;
+  const eval_=hasData?evaluateTrade(t.send,t.receive,numTeams):null;
+  
+  return`<div style="padding:16px">
+    <div class="section-hdr" style="background:transparent;padding:0 0 10px">Mid-Draft Trade Evaluator</div>
+    <div style="font-size:11px;color:var(--text2);margin-bottom:14px;line-height:1.6">Enter picks as round.pick (e.g., <span class="mono" style="color:var(--text)">3.05</span>) or overall number (e.g., <span class="mono" style="color:var(--text)">29</span>). The tool shows what players you can expect at each pick based on the current board.</div>
+    
+    <div style="display:flex;gap:14px;margin-bottom:14px">
+      <div class="trade-side">
+        <h4 style="color:var(--danger)">You Send</h4>
+        <div class="trade-input">
+          <input id="tradeSendInput" placeholder="e.g., 3.05" value="${t.sendInput}"/>
+          <button class="btn btn-sm" id="tradeSendAdd">Add</button>
+        </div>
+        <div>${t.send.map((p,i)=>{
+          const overall=parsePick(p,numTeams);const r=overall?Math.ceil(overall/numTeams):0;const ip=overall?((overall-1)%numTeams)+1:0;
+          const exp=overall?getExpectedPlayerAtPick(overall):null;
+          return`<div class="trade-chip"><span class="mono">${r}.${String(ip).padStart(2,'0')}</span>${exp?` <span style="color:var(--text3)">≈ ${exp.name}</span>`:''}<span class="x" data-trade-rm="send-${i}">✕</span></div>`;
+        }).join('')}</div>
+      </div>
+      <div style="display:flex;align-items:center;font-size:20px;color:var(--accent)">⇄</div>
+      <div class="trade-side">
+        <h4 style="color:var(--live)">You Receive</h4>
+        <div class="trade-input">
+          <input id="tradeReceiveInput" placeholder="e.g., 5.10" value="${t.receiveInput}"/>
+          <button class="btn btn-sm" id="tradeReceiveAdd">Add</button>
+        </div>
+        <div>${t.receive.map((p,i)=>{
+          const overall=parsePick(p,numTeams);const r=overall?Math.ceil(overall/numTeams):0;const ip=overall?((overall-1)%numTeams)+1:0;
+          const exp=overall?getExpectedPlayerAtPick(overall):null;
+          return`<div class="trade-chip"><span class="mono">${r}.${String(ip).padStart(2,'0')}</span>${exp?` <span style="color:var(--text3)">≈ ${exp.name}</span>`:''}<span class="x" data-trade-rm="receive-${i}">✕</span></div>`;
+        }).join('')}</div>
+      </div>
+    </div>
+    
+    ${hasData?`<button class="btn btn-sm btn-ghost" id="tradeClearBtn" style="margin-bottom:14px">Clear Trade</button>`:''}
+    
+    ${eval_?`<div class="trade-verdict">
+      <div class="result" style="color:${eval_.verdict==='win'?'var(--live)':eval_.verdict==='lose'?'var(--danger)':'var(--text)'}">
+        ${eval_.verdict==='win'?'✓ You Win':eval_.verdict==='lose'?'✕ You Lose':'≈ Even'}
+      </div>
+      <div class="detail">
+        ${eval_.verdict==='win'?`You gain ~${eval_.delta} rank spots of value. The picks you receive project to better players than what you send.`:
+          eval_.verdict==='lose'?`You lose ~${Math.abs(eval_.delta)} rank spots of value. You're giving up better projected players than you get back.`:
+          'The trade is roughly even based on projected players at each pick.'}
+      </div>
+    </div>
+    
+    <div style="display:flex;gap:14px;margin-top:14px">
+      <div style="flex:1">
+        <div style="font-size:10px;color:var(--text3);text-transform:uppercase;letter-spacing:1px;margin-bottom:6px" class="mono">You send (projected)</div>
+        ${eval_.sendValues.map(v=>`<div style="display:flex;align-items:center;gap:6px;padding:4px 0;border-bottom:1px solid var(--border);font-size:11px">
+          <span class="mono" style="color:var(--text3);width:36px">${v.round}.${String(v.inRound).padStart(2,'0')}</span>
+          <span class="p-pos p-${v.pos}" style="font-size:9px">${v.pos}</span>
+          <span style="flex:1">${v.name}</span>
+          <span class="mono" style="color:var(--text3)">#${v.rank}</span>
+        </div>`).join('')}
+      </div>
+      <div style="flex:1">
+        <div style="font-size:10px;color:var(--text3);text-transform:uppercase;letter-spacing:1px;margin-bottom:6px" class="mono">You receive (projected)</div>
+        ${eval_.receiveValues.map(v=>`<div style="display:flex;align-items:center;gap:6px;padding:4px 0;border-bottom:1px solid var(--border);font-size:11px">
+          <span class="mono" style="color:var(--text3);width:36px">${v.round}.${String(v.inRound).padStart(2,'0')}</span>
+          <span class="p-pos p-${v.pos}" style="font-size:9px">${v.pos}</span>
+          <span style="flex:1">${v.name}</span>
+          <span class="mono" style="color:var(--text3)">#${v.rank}</span>
+        </div>`).join('')}
+      </div>
+    </div>`:'<div style="text-align:center;padding:30px;color:var(--text3);font-size:12px">Add picks to both sides to see the evaluation.</div>'}
+  </div>`;
+}
+
+// ── Positional Run Detection ──
+function detectRuns(lookback){
+  if(S.picks.length<lookback)return[];
+  const recent=S.picks.slice(-lookback);
+  const counts={QB:0,RB:0,WR:0,TE:0};
+  const players={QB:[],RB:[],WR:[],TE:[]};
+  recent.forEach(p=>{
+    const info=resolvePlayer(p.player_id);
+    if(info&&counts[info.position]!==undefined){
+      counts[info.position]++;
+      players[info.position].push(info.name);
+    }
+  });
+  const runs=[];
+  Object.entries(counts).forEach(([pos,count])=>{
+    if(count>=3){
+      const remaining=getBestAvailable(pos);
+      runs.push({pos,count,lookback,players:players[pos],remaining:remaining.length,
+        nextBest:remaining[0]?.name||'None',tier1Left:remaining.filter(p=>p.compositeRank<=30).length});
+    }
+  });
+  return runs;
+}
+
+// ══════════════════════════════════════════════════
+// FEATURE 1: TRADE-BACK CALCULATOR + TIER TRIGGERS
+// ══════════════════════════════════════════════════
+
+function detectTiers(players,gapThreshold){
+  // Group players into tiers based on composite rank gaps
+  if(!players.length)return[];
+  const tiers=[];let currentTier=[players[0]];
+  for(let i=1;i<players.length;i++){
+    const gap=players[i].compositeRank-players[i-1].compositeRank;
+    if(gap>gapThreshold){tiers.push(currentTier);currentTier=[players[i]];}
+    else{currentTier.push(players[i]);}
+  }
+  if(currentTier.length)tiers.push(currentTier);
+  return tiers;
+}
+
+function getTradeBackOpportunities(){
+  const results=[];
+  const next=getNextPick();if(!next)return results;
+  const ba=getBestAvailable(null);if(ba.length<5)return results;
+  const myPicks=getMyPicks();const currentPick=S.picks.length;
+  const picksUntilMine=next.overall-currentPick;
+  if(picksUntilMine>5)return results; // Only show when close to picking
+
+  // Detect tiers among top available players
+  const tiers=detectTiers(ba.slice(0,40),3);
+  if(!tiers.length)return results;
+
+  // Find which tier the top player falls in
+  const topTier=tiers[0];
+  const tierEnd=topTier[topTier.length-1];
+  const tierDepth=topTier.length;
+
+  // If tier has enough depth to trade back
+  if(tierDepth>=3){
+    // How far back can we trade and still get a player in this tier?
+    const safeTradeBack=Math.min(tierDepth-1,8);
+    const targetPick=next.overall+safeTradeBack;
+    const targetRound=Math.ceil(targetPick/(S.draft?.settings?.teams||12));
+    const targetInRound=((targetPick-1)%(S.draft?.settings?.teams||12))+1;
+    
+    // What's at the edge of the tier?
+    const worstInTier=topTier[Math.min(safeTradeBack,topTier.length-1)];
+    
+    // Value of the trade-back in pick terms
+    const roundDiff=targetRound-next.round;
+
+    results.push({
+      type:'flat-tier',
+      tierSize:tierDepth,
+      safeTradeBack,
+      currentPick:`${next.round}.${String(next.pick).padStart(2,'0')}`,
+      targetPick:`${targetRound}.${String(targetInRound).padStart(2,'0')}`,
+      targetOverall:targetPick,
+      bestInTier:topTier[0].name,
+      worstInTier:worstInTier.name,
+      tierPositions:[...new Set(topTier.map(p=>p.position))].join('/'),
+      suggestion:roundDiff>=1?
+        `Trade ${next.round}.${String(next.pick).padStart(2,'0')} → ${targetRound}.${String(targetInRound).padStart(2,'0')} + 2027 ${roundDiff>=2?'1st':'2nd'}`:
+        `Trade back ${safeTradeBack} spots for a future 3rd`
+    });
+  }
+
+  // Check if there's a cliff coming (next tier is much worse)
+  if(tiers.length>=2){
+    const cliff=tiers[1][0].compositeRank-tiers[0][tiers[0].length-1].compositeRank;
+    if(cliff>=8){
+      results.push({
+        type:'cliff-warning',
+        cliffSize:cliff,
+        lastBeforeCliff:tiers[0][tiers[0].length-1].name,
+        firstAfterCliff:tiers[1][0].name,
+        playersBeforeCliff:tiers[0].length,
+        msg:`${cliff}-rank cliff after ${tiers[0][tiers[0].length-1].name}. ${tiers[0].length} players left before the drop.`
+      });
+    }
+  }
+
+  return results;
+}
+
+// ══════════════════════════════════════════════════
+// FEATURE 2: OPPONENT BUILD PROFILING
+// ══════════════════════════════════════════════════
+
+function profileOpponents(){
+  const teams=S.draft?.settings?.teams||12;
+  const profiles={};
+
+  // Group picks by owner
+  S.picks.forEach(pick=>{
+    const uid=pick.picked_by;if(!uid)return;
+    if(!profiles[uid])profiles[uid]={uid,name:getOwnerName(uid),picks:[],positions:{QB:0,RB:0,WR:0,TE:0,PICK:0},ages:[],totalValue:0,isMe:uid===S.userId};
+    const info=resolvePlayer(pick.player_id);
+    if(!info)return;
+    const pos=info.isRookiePick?'PICK':(info.position||'?');
+    profiles[uid].picks.push({...info,pos});
+    if(profiles[uid].positions[pos]!==undefined)profiles[uid].positions[pos]++;
+    if(info.age&&!info.isRookiePick)profiles[uid].ages.push(info.age);
+    const analysis=getPlayerAnalysis(info.name,info.id,info);
+    profiles[uid].totalValue+=(analysis?.sortValue||0);
+  });
+
+  // Classify builds
+  Object.values(profiles).forEach(p=>{
+    const avgAge=p.ages.length?p.ages.reduce((s,a)=>s+a,0)/p.ages.length:25;
+    const youngPct=p.ages.filter(a=>a<25).length/Math.max(p.ages.length,1);
+    const oldPct=p.ages.filter(a=>a>=28).length/Math.max(p.ages.length,1);
+    const pickCount=p.positions.PICK||0;
+    
+    if(avgAge>27.5||oldPct>0.5)p.build='contender';
+    else if(avgAge<24.5||youngPct>0.6||pickCount>=2)p.build='rebuild';
+    else p.build='balanced';
+    p.avgAge=avgAge;
+
+    // Detect needs: positions with 0 picks that they'll need
+    p.needs=[];
+    if(p.positions.QB===0&&p.picks.length>=3)p.needs.push('QB');
+    if(p.positions.RB===0&&p.picks.length>=3)p.needs.push('RB');
+    if(p.positions.TE===0&&p.picks.length>=4)p.needs.push('TE');
+    
+    // Trade likelihood: rebuilders want future picks, contenders want players
+    p.tradeTarget=null;
+    if(p.build==='rebuild'&&!p.isMe)p.tradeTarget='Likely to sell startup picks for future 1sts';
+    if(p.build==='contender'&&!p.isMe)p.tradeTarget='May overpay to trade up for positional need';
+  });
+
+  return Object.values(profiles).filter(p=>!p.isMe).sort((a,b)=>b.totalValue-a.totalValue);
+}
+
+function renderOpponentProfiles(){
+  const profiles=profileOpponents();
+  if(!profiles.length)return'<div style="padding:20px;text-align:center;color:var(--text3);font-size:12px">Picks need to start before builds can be profiled.</div>';
+  
+  const posColors={QB:'var(--qb)',RB:'var(--rb)',WR:'var(--wr)',TE:'var(--te)',PICK:'var(--pick)'};
+  
+  return`<div style="padding:16px">
+    <div class="section-hdr" style="background:transparent;padding:0 0 10px">Opponent Build Profiles</div>
+    <div style="font-size:11px;color:var(--text2);margin-bottom:14px;line-height:1.6">Based on draft picks so far. Use to identify trade-back targets and positional panic.</div>
+    ${profiles.map(p=>{
+      const total=Object.values(p.positions).reduce((s,v)=>s+v,0)||1;
+      return`<div class="opp-card">
+        <div class="opp-hdr">
+          <span class="opp-name">${p.name}</span>
+          <span class="opp-tag ${p.build}">${p.build}</span>
+          <span style="font-size:10px;color:var(--text3)" class="mono">${p.avgAge.toFixed(1)}y</span>
+        </div>
+        <div class="opp-bar">${['QB','RB','WR','TE','PICK'].map(pos=>{
+          const pct=(p.positions[pos]/total)*100;
+          return pct>0?`<span style="width:${pct}%;background:${posColors[pos]}" title="${pos}: ${p.positions[pos]}"></span>`:'';
+        }).join('')}</div>
+        <div class="opp-stats">${['QB','RB','WR','TE'].map(pos=>`<span style="color:${posColors[pos]}">${pos}${p.positions[pos]}</span>`).join('')}${p.positions.PICK?`<span style="color:var(--pick)">PK${p.positions.PICK}</span>`:''}</div>
+        ${p.needs.length?`<div class="opp-need">Needs: ${p.needs.join(', ')}</div>`:''}
+        ${p.tradeTarget?`<div style="font-size:10px;color:var(--text2);margin-top:3px;font-style:italic">${p.tradeTarget}</div>`:''}
+      </div>`;
+    }).join('')}
+  </div>`;
+}
+
+// ══════════════════════════════════════════════════
+// FEATURE 3: FUTURE ROOKIE PICK VALUES IN TRADES
+// ══════════════════════════════════════════════════
+
+const FUTURE_PICK_VALUES={
+  // Approximate FC values for future picks (dynasty SF)
+  '2026_1_early':6600,'2026_1_mid':4500,'2026_1_late':3000,
+  '2026_2_early':2200,'2026_2_mid':1700,'2026_2_late':1300,
+  '2026_3_early':900,'2026_3_mid':700,'2026_3_late':500,
+  '2027_1_early':5500,'2027_1_mid':3800,'2027_1_late':2500,
+  '2027_2_early':1800,'2027_2_mid':1400,'2027_2_late':1000,
+  '2027_3':600,
+  '2028_1':2800,'2028_2':1200,'2028_3':500,
+};
+
+function getFuturePickValue(pickStr){
+  // Parse strings like "2027 1st", "2027 early 1st", "2026 mid 2nd"
+  const s=pickStr.toLowerCase().trim();
+  const m=s.match(/(20\d\d)\s*(early|mid|late)?\s*(\d+)(?:st|nd|rd|th)/);
+  if(!m)return null;
+  const year=m[1],slot=m[2]||'mid',round=m[3];
+  const key=`${year}_${round}_${slot}`;
+  let val=FUTURE_PICK_VALUES[key];
+  if(!val){
+    // Fallback: try without slot
+    val=FUTURE_PICK_VALUES[`${year}_${round}`];
+  }
+  if(!val)return null;
+  return{label:`${year} ${slot!=='mid'?slot+' ':''}${round}${round==='1'?'st':round==='2'?'nd':'rd'}`,value:val,isFuture:true};
+}
+
+// Enhanced trade evaluator that handles both startup picks and future picks
+function evaluateTradeEnhanced(sendItems,receiveItems,numTeams){
+  let sendTotal=0,receiveTotal=0;
+  const sendDetails=[],receiveDetails=[];
+
+  sendItems.forEach(item=>{
+    const fp=getFuturePickValue(item);
+    if(fp){sendTotal+=fp.value;sendDetails.push({type:'future',label:fp.label,value:fp.value});return;}
+    const overall=parsePick(item,numTeams);
+    if(overall){
+      const player=getExpectedPlayerAtPick(overall);
+      const r=Math.ceil(overall/numTeams),ip=((overall-1)%numTeams)+1;
+      const analysis=player?getPlayerAnalysis(player.name,player.id||player.sleeperId,player):null;
+      const val=analysis?.sortValue||player?.value||0;
+      sendTotal+=val;
+      sendDetails.push({type:'startup',pick:`${r}.${String(ip).padStart(2,'0')}`,overall,player:player?.name||'?',pos:player?.position||'?',value:val,rank:player?.compositeRank||999});
+    }
+  });
+
+  receiveItems.forEach(item=>{
+    const fp=getFuturePickValue(item);
+    if(fp){receiveTotal+=fp.value;receiveDetails.push({type:'future',label:fp.label,value:fp.value});return;}
+    const overall=parsePick(item,numTeams);
+    if(overall){
+      const player=getExpectedPlayerAtPick(overall);
+      const r=Math.ceil(overall/numTeams),ip=((overall-1)%numTeams)+1;
+      const analysis=player?getPlayerAnalysis(player.name,player.id||player.sleeperId,player):null;
+      const val=analysis?.sortValue||player?.value||0;
+      receiveTotal+=val;
+      receiveDetails.push({type:'startup',pick:`${r}.${String(ip).padStart(2,'0')}`,overall,player:player?.name||'?',pos:player?.position||'?',value:val,rank:player?.compositeRank||999});
+    }
+  });
+
+  const delta=receiveTotal-sendTotal;
+  const pctDiff=sendTotal>0?((delta/sendTotal)*100):0;
+  return{sendDetails,receiveDetails,sendTotal,receiveTotal,delta,pctDiff,
+    verdict:pctDiff>5?'win':pctDiff<-5?'lose':'even'};
+}
+
+// ══════════════════════════════════════════════════
+// FEATURE 4: TEP SCARCITY MONTE CARLO
+// ══════════════════════════════════════════════════
+
+function runTEPScarcitySim(iterations=2000){
+  const ba=getBestAvailable(null);if(ba.length<10)return null;
+  const next=getNextPick();if(!next)return null;
+  const myPicks=getMyPicks().filter(p=>p.overall>S.picks.length);
+  if(!myPicks.length)return null;
+
+  const teams=S.draft?.settings?.teams||12;
+  const currentPick=S.picks.length;
+
+  // What positions have I already drafted?
+  const myDraftedPositions={QB:0,RB:0,WR:0,TE:0};
+  S.picks.filter(p=>p.picked_by===S.userId).forEach(p=>{
+    const info=resolvePlayer(p.player_id);
+    if(info&&myDraftedPositions[info.position]!==undefined)myDraftedPositions[info.position]++;
+  });
+
+  // Simulate: for each of my remaining picks, what's the probability of landing a starter at each position?
+  const results={};
+  ['QB','RB','WR','TE'].forEach(pos=>{
+    const posPlayers=ba.filter(p=>p.position===pos);
+    let starterHits=0; // How often do I get a top-tier player at this position?
+    const threshold=pos==='TE'?15:pos==='QB'?20:30; // Top N at position = "starter quality"
+
+    for(let sim=0;sim<iterations;sim++){
+      let gotOne=false;
+      // For each of my picks, simulate whether the best available at that position survives to my pick
+      for(const myPick of myPicks){
+        const picksBeforeMine=myPick.overall-currentPick;
+        // How many of this position's top players survive N picks of random drafting?
+        // Model: each pick before mine has a (posPlayers remaining / total remaining) chance of taking from this pool
+        let poolSize=posPlayers.filter(p=>(p.fcPosRank||99)<=threshold).length;
+        let totalPool=ba.length;
+        for(let k=0;k<picksBeforeMine&&poolSize>0;k++){
+          const probTaken=poolSize/Math.max(totalPool,1);
+          if(Math.random()<probTaken){poolSize--;} // someone takes one
+          totalPool--;
+        }
+        if(poolSize>0){gotOne=true;break;}
+      }
+      if(gotOne)starterHits++;
+    }
+
+    results[pos]={
+      prob:Math.round((starterHits/iterations)*100),
+      available:posPlayers.length,
+      topAvailable:posPlayers.filter(p=>(p.fcPosRank||99)<=threshold).length,
+      bestAvail:posPlayers[0]?.name||'None',
+      alreadyHave:myDraftedPositions[pos],
+    };
+  });
+
+  return results;
+}
+
+function renderScarcitySim(){
+  const sim=runTEPScarcitySim(1500);
+  if(!sim)return'<div style="padding:20px;text-align:center;color:var(--text3);font-size:12px">Need active draft with remaining picks to simulate.</div>';
+  
+  const posColors={QB:'var(--qb)',RB:'var(--rb)',WR:'var(--wr)',TE:'var(--te)'};
+  const isTEP=S.league?.scoring_settings?.bonus_rec_te>0||false;
+
+  return`<div style="padding:16px">
+    <div class="section-hdr" style="background:transparent;padding:0 0 10px">Position Scarcity Simulation</div>
+    <div style="font-size:11px;color:var(--text2);margin-bottom:14px;line-height:1.6">${isTEP?'<span style="color:var(--te);font-weight:600">TEP detected.</span> ':''}Monte Carlo sim (1,500 iterations): probability of landing a starter-quality player at each position across your remaining picks.</div>
+    ${['TE','QB','RB','WR'].map(pos=>{
+      const r=sim[pos];
+      const urgency=r.prob<40?'var(--danger)':r.prob<65?'var(--accent)':'var(--live)';
+      const barColor=posColors[pos];
+      return`<div class="mc-bar-wrap">
+        <span class="mc-bar-label" style="color:${posColors[pos]}">${pos} ${r.alreadyHave>0?`<span style="color:var(--text3)">(${r.alreadyHave})</span>`:''}</span>
+        <div class="mc-bar-track">
+          <div class="mc-bar-fill" style="width:${r.prob}%;background:${barColor};opacity:${r.prob<40?1:0.7}"></div>
+        </div>
+        <span class="mc-bar-pct" style="color:${urgency}">${r.prob}%</span>
+      </div>
+      <div class="mc-detail" style="margin-bottom:10px;padding-left:86px">
+        ${r.topAvailable} starter-tier left · Best: ${r.bestAvail}
+        ${r.prob<40?` · <span style="color:var(--danger);font-weight:600">⚠ HIGH SCARCITY RISK</span>`:''}
+        ${r.prob<60&&r.prob>=40?` · <span style="color:var(--accent)">Consider targeting soon</span>`:''}
+      </div>`;
+    }).join('')}
+    <div style="margin-top:14px;padding:10px;background:var(--surface2);border-radius:6px;font-size:11px;color:var(--text2);line-height:1.6">
+      <strong style="color:var(--text)">How to read:</strong> A 35% probability means in 65% of simulated drafts, all starter-quality players at that position were gone before your pick. Values below 50% suggest proactive targeting.
+    </div>
+  </div>`;
+}
+
+function renderModal(){
+  if(S.modal==='ktcPaste'){
+    const existing=Object.keys(S.sources.ktc.data).length;
+    return`<div class="modal-overlay" id="modalOverlay"><div class="modal">
+    <h3>Paste KTC Rankings</h3>
+    <div style="font-size:11px;color:var(--text2);margin-bottom:10px;line-height:1.6">
+      Go to <a href="https://keeptradecut.com/dynasty-rankings" target="_blank" style="color:var(--ktc-color)">keeptradecut.com/dynasty-rankings</a>, select all (Ctrl+A), copy (Ctrl+C), paste below.<br>
+      <strong>Multi-page:</strong> Paste page 1, click "Append", then go to page 2 on KTC and repeat.<br>
+      <strong>By position:</strong> Click QB/RB/WR/TE tabs on KTC, paste each separately.
+    </div>
+    ${existing>0?`<div style="font-size:11px;color:var(--live);margin-bottom:8px">✓ ${existing} players already loaded from KTC</div>`:''}
+    <textarea id="ktcPasteArea" placeholder="Paste KTC rankings page content here..."></textarea>
+    <div class="modal-btns">
+      <button class="btn btn-sm btn-ghost" id="modalCancel">Cancel</button>
+      ${existing>0?`<button class="btn btn-sm btn-ghost" id="ktcClearBtn" style="color:var(--danger)">Clear KTC</button>`:''}
+      ${existing>0?`<button class="btn btn-sm" id="ktcAppendBtn">Append (add to existing)</button>`:''}
+      <button class="btn btn-sm" id="ktcPasteSubmit">${existing>0?'Replace All':'Parse KTC Data'}</button>
+    </div>
+  </div></div>`;}
+  return'';
+}
+
+// ── Events ──
+function bindEvents(){
+  const cb=document.getElementById('connectBtn');
+  if(cb){cb.onclick=handleConnect;document.querySelectorAll('.setup-row input').forEach(i=>{i.onkeydown=e=>{if(e.key==='Enter')handleConnect();};});}
+  // Draft select cards
+  document.querySelectorAll('.draft-card[data-draft-id]').forEach(card=>{
+    card.onclick=()=>{connectToDraft(card.dataset.draftId);};
+  });
+  const backBtn=document.getElementById('backToSetup');
+  if(backBtn)backBtn.onclick=()=>{S.view='setup';S.draftList=[];render();};
+  // Switch draft button (visible only in room view when we have a draft list)
+  const sdBtn=document.getElementById('switchDraftBtn');
+  if(sdBtn){
+    if(S.view==='room'&&S.draftList.length>1){sdBtn.style.display='';sdBtn.onclick=()=>{stopPolling();S.view='draftSelect';S.draft=null;S.picks=[];render();};}
+    else if(S.view==='room'){sdBtn.style.display='';sdBtn.onclick=()=>{stopPolling();S.view='setup';render();};}
+    else{sdBtn.style.display='none';}
+  }
+  document.querySelectorAll('.pos-filter[data-pos]').forEach(b=>{b.onclick=()=>{S.posFilter=b.dataset.pos;render();};});
+  const rt=document.getElementById('rookieToggle');if(rt)rt.onclick=()=>{S.showRookies=!S.showRookies;render();};
+  const rb=document.getElementById('refreshBtn');if(rb)rb.onclick=pollDraft;
+  document.querySelectorAll('.room-tab').forEach(b=>{b.onclick=()=>{S.roomTab=b.dataset.rtab;render();};});
+  
+  // Trade evaluator
+  const tsa=document.getElementById('tradeSendAdd');
+  if(tsa)tsa.onclick=()=>{const inp=document.getElementById('tradeSendInput');if(inp&&inp.value.trim()){S.trade.send.push(inp.value.trim());S.trade.sendInput='';render();}};
+  const tra=document.getElementById('tradeReceiveAdd');
+  if(tra)tra.onclick=()=>{const inp=document.getElementById('tradeReceiveInput');if(inp&&inp.value.trim()){S.trade.receive.push(inp.value.trim());S.trade.receiveInput='';render();}};
+  const tcb=document.getElementById('tradeClearBtn');
+  if(tcb)tcb.onclick=()=>{S.trade={send:[],receive:[],sendInput:'',receiveInput:''};render();};
+  // Trade chip remove buttons
+  document.querySelectorAll('[data-trade-rm]').forEach(btn=>{
+    btn.onclick=()=>{const[side,idx]=btn.dataset.tradeRm.split('-');S.trade[side].splice(parseInt(idx),1);render();};
+  });
+  // Future pick quick-add buttons
+  document.querySelectorAll('[data-fp-send]').forEach(btn=>{
+    btn.onclick=()=>{S.trade.send.push(btn.dataset.fpSend);render();};
+  });
+  document.querySelectorAll('[data-fp-recv]').forEach(btn=>{
+    btn.onclick=()=>{S.trade.receive.push(btn.dataset.fpRecv);render();};
+  });
+  // Trade input enter key
+  const tsi=document.getElementById('tradeSendInput');
+  if(tsi)tsi.onkeydown=e=>{if(e.key==='Enter'&&tsi.value.trim()){S.trade.send.push(tsi.value.trim());S.trade.sendInput='';render();}};
+  const tri=document.getElementById('tradeReceiveInput');
+  if(tri)tri.onkeydown=e=>{if(e.key==='Enter'&&tri.value.trim()){S.trade.receive.push(tri.value.trim());S.trade.receiveInput='';render();}};
+  // Weight sliders
+  document.querySelectorAll('.weight-slider').forEach(sl=>{sl.oninput=()=>{S.sources[sl.dataset.src].weight=parseInt(sl.value);saveLocal('weights',{fc:S.sources.fc.weight,ktc:S.sources.ktc.weight,csv:S.sources.csv.weight});render();};});
+  // KTC paste
+  const pkb=document.getElementById('pasteKtcBtn');if(pkb)pkb.onclick=()=>{S.modal='ktcPaste';render();};
+  const ks=document.getElementById('ktcPasteSubmit');if(ks)ks.onclick=()=>{const ta=document.getElementById('ktcPasteArea');if(ta&&ta.value.trim()){parseKTCPaste(ta.value,false);S.modal=null;render();}};
+  const ka=document.getElementById('ktcAppendBtn');if(ka)ka.onclick=()=>{const ta=document.getElementById('ktcPasteArea');if(ta&&ta.value.trim()){parseKTCPaste(ta.value,true);S.modal=null;render();}};
+  const kc=document.getElementById('ktcClearBtn');if(kc)kc.onclick=()=>{S.sources.ktc.data={};S.sources.ktc.status='idle';clearLocal('ktc_cache');S.modal=null;updatePills();render();};
+  // CSV upload
+  const ucb=document.getElementById('uploadCsvBtn');const cfi=document.getElementById('csvFileInput');
+  if(ucb&&cfi){ucb.onclick=()=>cfi.click();cfi.onchange=e=>{const f=e.target.files[0];if(!f)return;const r=new FileReader();r.onload=ev=>{const nm=f.name.replace(/\.[^.]+$/,'');parseCSV(ev.target.result,nm);};r.readAsText(f);};}
+  // Modal dismiss
+  const mo=document.getElementById('modalOverlay');if(mo)mo.onclick=e=>{if(e.target===mo){S.modal=null;render();}};
+  const mc=document.getElementById('modalCancel');if(mc)mc.onclick=()=>{S.modal=null;render();};
+}
+
+async function handleConnect(){
+  const di=document.getElementById('draftIdInput'),ui=document.getElementById('usernameInput');
+  let draftId=(di?.value||'').trim();const username=(ui?.value||'').trim();
+  S.error='';S.draftId=draftId;S.username=username;
+  if(username)saveLocal('username',username);
+  if(!draftId&&!username){S.error='Enter a Draft ID or username.';render();return;}
+  S.view='loading';S.loadingMsg='Looking up user...';render();
+  try{
+    // If they gave a direct draft ID, skip selection
+    if(draftId){
+      if(username){const u=await lookupUser(username);if(u?.user_id)S.userId=u.user_id;}
+      await connectToDraft(draftId);
+      return;
+    }
+    // Otherwise, look up user and fetch all their drafts
+    if(username){const u=await lookupUser(username);if(!u?.user_id)throw new Error('User not found');S.userId=u.user_id;}
+    S.loadingMsg='Finding drafts...';render();
+    const allDrafts=[];
+    for(const yr of[2026,2025,2024]){
+      try{
+        const ds=await fetchJSON(`${SLEEPER}/user/${S.userId}/drafts/nfl/${yr}`);
+        for(const d of ds){
+          const entry={draft:d,year:yr,leagueName:'',leagueRosterPositions:[],leagueScoringTep:false,pickCount:0};
+          // Fetch league name and settings
+          if(d.league_id){
+            try{
+              const lg=await fetchJSON(`${SLEEPER}/league/${d.league_id}`);
+              entry.leagueName=lg.name||'League';
+              entry.leagueRosterPositions=lg.roster_positions||[];
+              entry.leagueScoringTep=(lg.scoring_settings?.bonus_rec_te||0)>0;
+            }catch(e){entry.leagueName=`League ${d.league_id.slice(-4)}`;}
+          }
+          // Fetch pick count for active/complete drafts
+          if(d.status==='drafting'||d.status==='complete'){
+            try{const picks=await fetchJSON(`${SLEEPER}/draft/${d.draft_id}/picks`);entry.pickCount=picks.length;}catch(e){}
+          }
+          allDrafts.push(entry);
+        }
+      }catch(e){continue;}
+    }
+    if(!allDrafts.length)throw new Error('No drafts found for this user.');
+    // If only 1 draft or one is live, auto-connect
+    const liveDraft=allDrafts.find(d=>d.draft.status==='drafting');
+    if(allDrafts.length===1){await connectToDraft(allDrafts[0].draft.draft_id);return;}
+    if(liveDraft&&allDrafts.filter(d=>d.draft.status==='drafting').length===1){await connectToDraft(liveDraft.draft.draft_id);return;}
+    // Show selection
+    S.draftList=allDrafts;S.view='draftSelect';render();
+  }catch(e){S.view='setup';S.error=e.message;render();}
+}
+
+async function connectToDraft(draftId){
+  S.draftId=draftId;
+  S.view='loading';S.loadingMsg='Loading draft...';render();
+  try{
+    S.draft=await getDraft(draftId);
+    if(S.draft.league_id){S.loadingMsg='Loading league...';render();
+      try{S.users=await getLeagueUsers(S.draft.league_id);S.league=await fetchJSON(`${SLEEPER}/league/${S.draft.league_id}`);}catch(e){}}
+    // If we don't have userId yet, try to find ourselves in draft_order
+    if(!S.userId&&S.username){
+      try{const u=await lookupUser(S.username);if(u?.user_id)S.userId=u.user_id;}catch(e){}
+    }
+    S.loadingMsg='Loading picks...';render();S.picks=await getDraftPicks(draftId);
+    S.loadingMsg='Loading players...';render();try{S.playerDb=await getPlayers();}catch(e){}
+    S.loadingMsg='Loading FantasyCalc...';render();
+    const rp=S.league?.roster_positions||S.draft.settings?.roster_positions||[];
+    const nq=rp.filter(p=>p==='SUPER_FLEX'||p==='QB').length>1?2:1;
+    const nt=S.draft.settings?.teams||12;const ppr=S.league?.scoring_settings?.rec||1;
+    await loadFC(nq,nt,ppr);
+    // Try KTC in background
+    loadKTC();
+    S.view='room';S.lastPollCount=S.picks.length;render();startPolling();
+  }catch(e){S.view='setup';S.error=e.message;render();}
+}
+
+render();
+</script>
+</body>
+</html>
