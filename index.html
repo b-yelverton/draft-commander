@@ -243,6 +243,17 @@ body{background:var(--bg);color:var(--text);font-family:'Sora',sans-serif;min-he
 .draft-card .dc-progress-bar{height:100%;border-radius:2px;background:var(--accent);transition:width .3s}
 .draft-year-hdr{font-size:10px;font-weight:600;color:var(--text3);letter-spacing:2px;text-transform:uppercase;padding:var(--sp-md) 0 var(--sp-sm);width:100%;max-width:1000px}
 
+/* Tip jar */
+.tip-btn{display:inline-flex;align-items:center;gap:5px;background:var(--surface2);border:1px solid var(--border);border-radius:var(--radius-sm);padding:5px 10px;font-size:10px;font-weight:600;color:var(--accent2);cursor:pointer;font-family:inherit;transition:all .15s;text-decoration:none;letter-spacing:.2px;white-space:nowrap}
+.tip-btn:hover{border-color:var(--accent2);background:rgba(166,117,53,.08);color:var(--accent2);transform:translateY(-1px)}
+.tip-btn:active{transform:translateY(0)}
+.tip-btn .tip-icon{font-size:13px;line-height:1}
+.tip-cta{display:flex;align-items:center;gap:var(--sp-md);background:var(--surface);border:1px solid var(--border);border-radius:var(--radius-lg);padding:var(--sp-lg);margin-top:var(--sp-2xl);max-width:440px;width:100%}
+.tip-cta .tip-cta-text{flex:1}
+.tip-cta .tip-cta-text .tip-cta-title{font-size:12px;font-weight:600;color:var(--text);margin-bottom:2px}
+.tip-cta .tip-cta-text .tip-cta-sub{font-size:11px;color:var(--text3);line-height:1.5}
+.tip-cta .tip-btn{padding:8px 16px;font-size:11px}
+
 /* Empty states */
 .empty-state{padding:48px 24px;text-align:center}
 .empty-state h3{font-family:'Instrument Serif',serif;font-style:italic;font-size:22px;color:var(--text);margin-bottom:var(--sp-sm);font-weight:400}
@@ -344,6 +355,7 @@ input:focus-visible,textarea:focus-visible,select:focus-visible{outline:none}
   </div>
   <div class="hdr-right">
     <div class="src-pills" id="srcPills"></div>
+    <a class="tip-btn" href="https://buymeacoffee.com/northofzero" target="_blank" rel="noopener"><span class="tip-icon">&#9749;</span>Tip Jar</a>
     <button class="refresh-btn" id="switchDraftBtn" style="display:none">Switch Draft</button>
     <div class="hdr-live off" id="liveIndicator">
       <div class="dot"></div>
@@ -925,6 +937,13 @@ function renderSetup(){
         <div style="font-family:'Instrument Serif',serif;font-style:italic;font-size:18px;color:var(--accent);margin-bottom:2px">Monte Carlo</div>
         <div style="font-size:10px;color:var(--text3);line-height:1.5">Scarcity sim<br>for your picks</div>
       </div>
+    </div>
+    <div class="tip-cta">
+      <div class="tip-cta-text">
+        <div class="tip-cta-title">Built for the community</div>
+        <div class="tip-cta-sub">Draft Commander is free and open source. If it helps you win your draft, consider leaving a tip.</div>
+      </div>
+      <a class="tip-btn" href="https://buymeacoffee.com/northofzero" target="_blank" rel="noopener"><span class="tip-icon">&#9749;</span>Buy me a coffee</a>
     </div>
   </div>`;
 }
