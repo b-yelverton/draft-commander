@@ -36,6 +36,7 @@
   --live-rgb:42,126,59;
   --text3-rgb:158,142,124;
   --shimmer:#e8e0d5;
+  --surface-rgb:255,253,249;--glass-blur:12px;--glass-opacity:0.72;
 }
 [data-theme="dark"]{
   color-scheme:dark;
@@ -58,6 +59,7 @@
   --live-rgb:80,184,104;
   --text3-rgb:107,101,120;
   --shimmer:#33303c;
+  --surface-rgb:30,28,34;--glass-blur:12px;--glass-opacity:0.78;
 }
 :root{
   --sp-xs:4px;--sp-sm:8px;--sp-md:12px;--sp-lg:16px;--sp-xl:20px;--sp-2xl:24px;--sp-3xl:32px;
@@ -340,6 +342,14 @@ body,.hdr,.sidebar,.board-panel,.room-top,.sb-section,.sb-rec,.p-row,.setup,.dra
 }
 /* Suppress transitions on initial load */
 .no-transitions,.no-transitions *,.no-transitions *::before,.no-transitions *::after{transition:none!important}
+
+/* Glassmorphism — progressive enhancement */
+@supports (backdrop-filter:blur(1px)){
+  .hdr{background:rgba(var(--surface-rgb),var(--glass-opacity));-webkit-backdrop-filter:blur(var(--glass-blur));backdrop-filter:blur(var(--glass-blur))}
+  .modal-overlay{background:rgba(var(--shadow-rgb),.5);-webkit-backdrop-filter:blur(8px);backdrop-filter:blur(8px)}
+  .room-top{background:rgba(var(--surface-rgb),var(--glass-opacity));-webkit-backdrop-filter:blur(var(--glass-blur));backdrop-filter:blur(var(--glass-blur))}
+  .section-hdr{background:rgba(var(--surface-rgb),var(--glass-opacity));-webkit-backdrop-filter:blur(8px);backdrop-filter:blur(8px)}
+}
 
 /* Empty states */
 .empty-state{padding:48px 24px;text-align:center}
