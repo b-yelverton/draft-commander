@@ -444,6 +444,12 @@ body,.hdr,.sidebar,.board-panel,.room-top,.sb-section,.sb-rec,.p-row,.setup,.dra
 .skeleton-card{height:80px;margin-bottom:var(--sp-sm);border-radius:var(--radius-lg)}
 .skeleton-row{height:28px;margin-bottom:var(--sp-xs);border-radius:var(--radius-sm)}
 .val-pending{color:var(--text3);opacity:0.4}
+@keyframes valIn{from{opacity:0;transform:translateY(2px)}to{opacity:1;transform:translateY(0)}}
+.val-hydrated{animation:valIn .3s var(--ease-out-quart) both}
+.p-row:nth-child(n+5) .val-hydrated{animation-delay:20ms}
+.p-row:nth-child(n+15) .val-hydrated{animation-delay:40ms}
+.p-row:nth-child(n+30) .val-hydrated{animation-delay:60ms}
+.p-row:nth-child(n+50) .val-hydrated{animation:none;opacity:1}
 @media(prefers-reduced-motion:reduce){.skeleton{animation:none}}
 
 /* Focus ring global */
@@ -574,7 +580,7 @@ async function loadKTC(){
     if(html)break;
   }
   if(html){parseKTC(html);return;}
-  S.sources.ktc.status='unavailable';updatePills();scheduleRoomUpdate();
+  S.sources.ktc.status='unavailable';hydrateSourceColumn('ktc');
 }
 
 function parseKTC(html){
@@ -603,7 +609,7 @@ function parseKTC(html){
   S.sources.ktc.data=d;S.sources.ktc.max=mx||9999;
   S.sources.ktc.status=count>20?'live':'parse-error';
   if(count>20)saveLocal('ktc_cache',{data:d,max:mx,ts:Date.now()});
-  updatePills();scheduleRoomUpdate();
+  hydrateSourceColumn('ktc');
 }
 
 function parseKTCPaste(text,append){
@@ -675,7 +681,7 @@ function parseKTCPaste(text,append){
   S.sources.ktc.data=d;S.sources.ktc.max=mx||9999;
   S.sources.ktc.status=count>10?'live':'parse-error';
   if(count>10)saveLocal('ktc_cache',{data:d,max:mx||9999,ts:Date.now()});
-  updatePills();scheduleRoomUpdate();
+  hydrateSourceColumn('ktc');
 }
 
 // ── Dynasty Daddy ──
@@ -710,7 +716,7 @@ async function loadDD(){
     S.sources.dd.status=Object.keys(d).length>20?'live':'parse-error';
     if(Object.keys(d).length>20)saveLocal('dd_cache',{data:d,max:mx,ts:Date.now()});
   }catch(e){console.error('DD:',e);S.sources.dd.status='unavailable';}
-  updatePills();scheduleRoomUpdate();
+  hydrateSourceColumn('dd');
 }
 
 // ── DynastyProcess ──
@@ -740,7 +746,7 @@ async function loadDP(){
     S.sources.dp.status=Object.keys(d).length>20?'live':'parse-error';
     if(Object.keys(d).length>20)saveLocal('dp_cache',{data:d,max:mx,ts:Date.now()});
   }catch(e){console.error('DP:',e);S.sources.dp.status='unavailable';}
-  updatePills();scheduleRoomUpdate();
+  hydrateSourceColumn('dp');
 }
 
 // ── CSV Upload ──
@@ -1018,6 +1024,50 @@ function scheduleRoomUpdate(){
   });
 }
 
+function hydrateSourceColumn(sourceKey){
+  if(S.view!=='room'){scheduleRoomUpdate();return;}
+  const bp=document.querySelector('.board-panel');
+  if(!bp||!bp.querySelector('.p-row[data-player-id]')){scheduleRoomUpdate();return;}
+  const ba=getBestAvailable(S.posFilter==='ALL'?null:S.posFilter);
+  const lookup={};ba.forEach(p=>{lookup[String(p.id)]=p;});
+  const isLive=S.sources[sourceKey].status==='live';
+  bp.querySelectorAll('.p-row[data-player-id]').forEach(row=>{
+    const p=lookup[row.dataset.playerId];if(!p)return;
+    const cell=row.querySelector('.p-val.'+sourceKey);
+    if(cell){
+      const val=sourceKey==='ktc'?p.ktcRank:sourceKey==='dd'?p.ddRank:sourceKey==='dp'?p.dpRank:null;
+      if(isLive){
+        cell.textContent=val?'#'+(sourceKey==='dp'?Math.round(val):val):'--';
+        cell.classList.add('val-hydrated');
+      }else{
+        cell.innerHTML='<span class="val-pending">--</span>';
+      }
+    }
+    if(sourceKey==='ktc'){
+      const spans=row.querySelectorAll(':scope > span');
+      const last=spans[spans.length-1];
+      if(last&&last.style.width==='50px'){
+        if(isLive&&p.ktcRank){
+          const rd=p.rankDelta;const color=rd>0?'var(--live)':rd<0?'var(--danger)':'var(--text3)';
+          const arrow=rd>0?'\u2191':rd<0?'\u2193':'';
+          last.textContent=`${rd>0?'+':''}${rd} ${arrow}`;
+          last.style.color=color;last.style.fontFamily="'JetBrains Mono',monospace";
+          last.style.fontSize='10px';last.className='val-hydrated';
+        }else if(isLive){
+          last.textContent='--';last.style.color='var(--text3)';last.className='';
+        }else{
+          last.textContent='--';last.className='val-pending';
+        }
+      }
+    }
+  });
+  const recs=getRecommendations();
+  const recent=[...S.picks].reverse().slice(0,15);
+  const sb=document.querySelector('.sidebar');
+  if(sb){const st=sb.scrollTop;sb.innerHTML=renderSidebarInner(recs,recent);sb.scrollTop=st;}
+  updatePills();bindEvents();
+}
+
 function updateRoomData(){
   const teams=S.draft?.settings?.teams||12;
   const ba=getBestAvailable(S.posFilter==='ALL'?null:S.posFilter);
@@ -1286,7 +1336,7 @@ function renderBoardInner(ba,recs){
         rankDeltaHtml='<span style="width:50px;text-align:center;font-size:10px" class="val-pending">--</span>';
       }
 
-      return`<div class="p-row ${isRec?'recommended':''} ${dvgCls}">
+      return`<div class="p-row ${isRec?'recommended':''} ${dvgCls}" data-player-id="${p.id}">
         <span class="p-rank">${p.compositeRank}</span>
         <span class="p-pos p-${p.position}">${p.position}</span>
         <span class="p-name">${p.name}</span>
