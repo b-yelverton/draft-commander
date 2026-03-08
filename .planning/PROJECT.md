@@ -8,6 +8,19 @@ A dynasty fantasy football live draft assistant deployed as a single-file static
 
 Give dynasty managers a real-time competitive edge during live drafts by aggregating multiple value sources into actionable BPA recommendations and mid-draft trade evaluation.
 
+## Current State
+
+**Shipped:** v1.0 — Responsive Design & Loading UX (2026-03-08)
+
+v1.0 delivered loading stability (targeted subtree updates, skeleton loading, rAF batching), mobile-first responsive layout (phone/tablet/desktop breakpoints), and mobile component polish (header collapse, tab scroll-snap, 44px touch targets). 10 requirements, 3 phases, 6 plans.
+
+### Capabilities
+- Responsive across phone (< 600px), tablet (600-1000px), and desktop (1000px+)
+- Stable rendering during background source loading with skeleton placeholders
+- Mobile header collapses to logo + live indicator, tabs scroll-snap horizontally
+- All interactive elements meet 44px touch targets on mobile
+- Setup, loading, and draft selection screens adapted for phone viewports
+
 ## Requirements
 
 ### Validated
@@ -27,11 +40,8 @@ Give dynasty managers a real-time competitive edge during live drafts by aggrega
 - ✓ KTC paste fallback when CORS proxy fails — existing
 - ✓ Source data cached in localStorage across sessions — existing
 - ✓ Deployed on Vercel as zero-build static site — existing
-
-### Active
-
-- [ ] App is responsive and usable on phone, tablet, and desktop
-- [ ] Source loading state doesn't cause visual overflow/breakage when entering room view
+- ✓ App is responsive and usable on phone, tablet, and desktop — v1.0
+- ✓ Source loading state doesn't cause visual overflow/breakage when entering room view — v1.0
 
 ### Out of Scope
 
@@ -41,13 +51,13 @@ Give dynasty managers a real-time competitive edge during live drafts by aggrega
 
 ## Context
 
-- Single-file static app: `index.html` (~1970 lines) with inline CSS and JS
-- No framework — vanilla JS with global state object `S` and full DOM re-render via `innerHTML`
-- Existing responsive: one `@media(max-width:1000px)` breakpoint that stacks the room grid to single column
-- Room view uses CSS Grid: `1fr 340px` with 340px sidebar for recommendations + recent picks + scarcity
-- Source loading is async: FantasyCalc awaited before room entry, KTC/DD/DP fire-and-forget in background
-- When background sources load, they call `render()` which rebuilds the entire DOM — this is when the visual overflow occurs
-- Header contains source status pills that update independently via `updatePills()`
+- Single-file static app: `index.html` (~2050 lines) with inline CSS and JS
+- No framework — vanilla JS with global state object `S`
+- Source loaders use targeted subtree updates via scheduleRoomUpdate() with rAF batching
+- renderBoardInner() and renderSidebarInner() enable surgical DOM updates without full re-render
+- Mobile-first CSS: base styles for phone, @media(min-width:1000px) for desktop
+- Phone breakpoint @media(max-width:599px) for header, room-top, trade-sides
+- Header updates pills independently via updatePills()
 
 ## Constraints
 
@@ -62,7 +72,12 @@ Give dynasty managers a real-time competitive edge during live drafts by aggrega
 |----------|-----------|---------|
 | Single-file architecture | Zero build complexity, instant deployment | ✓ Good |
 | Vanilla JS, no framework | No dependencies, full control | ✓ Good |
-| Full DOM re-render on state change | Simple mental model for single-file app | ⚠️ Revisit (causes input loss, scroll reset) |
+| Targeted subtree updates | Replaced full DOM re-render for source loading paths | ✓ Good (v1.0) |
+| Mobile-first CSS approach | Base styles target mobile, min-width restores desktop | ✓ Good (v1.0) |
+
+## Next Milestone Goals
+
+_Run `/gsd:new-milestone` to define next milestone_
 
 ---
-*Last updated: 2026-03-08 after initialization*
+*Last updated: 2026-03-08 after v1.0 completion*
