@@ -21,7 +21,7 @@ Requirements for this milestone. Each maps to roadmap phases.
 - [ ] **MOBI-03**: Header collapses on mobile — source pills hidden, shows logo and live indicator only
 - [ ] **MOBI-04**: Room tabs are horizontally scrollable on narrow viewports without overflow
 - [ ] **MOBI-05**: All interactive elements (buttons, tabs, filters) meet 44px minimum touch target on mobile viewports
-- [ ] **MOBI-06**: Setup screen, loading screen, and draft selection screen are usable on phone viewports
+- [x] **MOBI-06**: Setup screen, loading screen, and draft selection screen are usable on phone viewports
 
 ## v2 Requirements
 
@@ -65,7 +65,7 @@ Which phases cover which requirements. Updated during roadmap creation.
 | MOBI-03 | Phase 3 | Pending |
 | MOBI-04 | Phase 3 | Pending |
 | MOBI-05 | Phase 3 | Pending |
-| MOBI-06 | Phase 2 | Pending |
+| MOBI-06 | Phase 2 | Complete |
 
 **Coverage:**
 - v1 requirements: 10 total

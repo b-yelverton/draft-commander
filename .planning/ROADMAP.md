@@ -8,7 +8,7 @@
 ## Phases
 
 - [x] **Phase 1: Loading Stability** - Fix visual overflow and layout shift caused by background source loading
-- [ ] **Phase 2: Mobile Layout** - Restructure room view and non-room screens for phone and tablet viewports
+- [x] **Phase 2: Mobile Layout** - Restructure room view and non-room screens for phone and tablet viewports
 - [ ] **Phase 3: Mobile Component Polish** - Adapt header, tabs, and interactive elements for mobile usability
 
 ## Phase Details
@@ -38,7 +38,7 @@ Plans:
 **Plans:** 2 plans
 Plans:
 - [x] 02-01-PLAN.md -- Room grid mobile-first restructure with sidebar stacking and trade evaluator adaptation
-- [ ] 02-02-PLAN.md -- Non-room screen mobile adaptation (draft grid, setup, loading)
+- [x] 02-02-PLAN.md -- Non-room screen mobile adaptation (draft grid, setup, loading)
 
 ### Phase 3: Mobile Component Polish
 **Goal**: Individual UI components (header, tabs, buttons, filters) are adapted for touch interaction and narrow viewports
@@ -55,7 +55,7 @@ Plans:
 | Phase | Plans Complete | Status | Completed |
 |-------|---------------|--------|-----------|
 | 1. Loading Stability | 2/2 | Complete | 2026-03-08 |
-| 2. Mobile Layout | 1/2 | In progress | - |
+| 2. Mobile Layout | 2/2 | Complete | 2026-03-08 |
 | 3. Mobile Component Polish | 0/? | Not started | - |
 
 ---
