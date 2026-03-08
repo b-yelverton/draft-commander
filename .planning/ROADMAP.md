@@ -12,7 +12,7 @@
 
 ## Phases
 
-- [ ] **Phase 4: Dark Mode Foundation** - Theme toggle, color token migration, FOWT prevention
+- [ ] **Phase 4: Dark Mode Foundation** - Theme toggle, color token migration, FOWT prevention (2 plans)
 - [ ] **Phase 5: Glassmorphism & Visual Refresh** - Backdrop-filter effects, gradient backgrounds, glass surfaces
 - [ ] **Phase 6: Progressive Hydration** - Targeted column updates, fade-in animations, scroll preservation
 - [ ] **Phase 7: Design Quality Pass** - Impeccable-guided color audit, contrast verification, visual consistency
@@ -28,6 +28,10 @@
   2. User clicks theme toggle in header and the app smoothly transitions between light and dark modes
   3. User's theme choice persists across page reloads via localStorage
   4. All UI elements respond to theme change — no hardcoded colors remain that ignore the active theme
+**Plans:** 2 plans
+Plans:
+- [ ] 04-01-PLAN.md -- Color token migration to [data-theme] selectors, dark palette, rgba() conversion, FOWT prevention
+- [ ] 04-02-PLAN.md -- Theme toggle button, smooth transitions, system preference listener
 
 ### Phase 5: Glassmorphism & Visual Refresh
 **Goal**: Key UI surfaces use modern glass/blur aesthetics that enhance depth and visual hierarchy
@@ -61,7 +65,7 @@
 
 | Phase | Plans Complete | Status | Completed |
 |-------|---------------|--------|-----------|
-| 4. Dark Mode Foundation | 0/? | Pending | -- |
+| 4. Dark Mode Foundation | 0/2 | Pending | -- |
 | 5. Glassmorphism & Visual Refresh | 0/? | Pending | -- |
 | 6. Progressive Hydration | 0/? | Pending | -- |
 | 7. Design Quality Pass | 0/? | Pending | -- |
