@@ -450,7 +450,7 @@ async function loadKTC(){
     if(html)break;
   }
   if(html){parseKTC(html);return;}
-  S.sources.ktc.status='unavailable';updatePills();render();
+  S.sources.ktc.status='unavailable';updatePills();scheduleRoomUpdate();
 }
 
 function parseKTC(html){
@@ -479,7 +479,7 @@ function parseKTC(html){
   S.sources.ktc.data=d;S.sources.ktc.max=mx||9999;
   S.sources.ktc.status=count>20?'live':'parse-error';
   if(count>20)saveLocal('ktc_cache',{data:d,max:mx,ts:Date.now()});
-  updatePills();render();
+  updatePills();scheduleRoomUpdate();
 }
 
 function parseKTCPaste(text,append){
@@ -551,7 +551,7 @@ function parseKTCPaste(text,append){
   S.sources.ktc.data=d;S.sources.ktc.max=mx||9999;
   S.sources.ktc.status=count>10?'live':'parse-error';
   if(count>10)saveLocal('ktc_cache',{data:d,max:mx||9999,ts:Date.now()});
-  updatePills();render();
+  updatePills();scheduleRoomUpdate();
 }
 
 // ── Dynasty Daddy ──
@@ -586,7 +586,7 @@ async function loadDD(){
     S.sources.dd.status=Object.keys(d).length>20?'live':'parse-error';
     if(Object.keys(d).length>20)saveLocal('dd_cache',{data:d,max:mx,ts:Date.now()});
   }catch(e){console.error('DD:',e);S.sources.dd.status='unavailable';}
-  updatePills();render();
+  updatePills();scheduleRoomUpdate();
 }
 
 // ── DynastyProcess ──
@@ -616,7 +616,7 @@ async function loadDP(){
     S.sources.dp.status=Object.keys(d).length>20?'live':'parse-error';
     if(Object.keys(d).length>20)saveLocal('dp_cache',{data:d,max:mx,ts:Date.now()});
   }catch(e){console.error('DP:',e);S.sources.dp.status='unavailable';}
-  updatePills();render();
+  updatePills();scheduleRoomUpdate();
 }
 
 // ── CSV Upload ──
@@ -883,6 +883,33 @@ function updatePills(){
 }
 
 // ── Rendering ──
+let _roomUpdatePending=false;
+function scheduleRoomUpdate(){
+  if(_roomUpdatePending)return;
+  _roomUpdatePending=true;
+  requestAnimationFrame(()=>{
+    _roomUpdatePending=false;
+    if(S.view==='room')updateRoomData();
+    else render();
+  });
+}
+
+function updateRoomData(){
+  const teams=S.draft?.settings?.teams||12;
+  const ba=getBestAvailable(S.posFilter==='ALL'?null:S.posFilter);
+  const recs=getRecommendations();
+  const recent=[...S.picks].reverse().slice(0,15);
+
+  const bp=document.querySelector('.board-panel');
+  if(bp){const st=bp.scrollTop;bp.innerHTML=renderBoardInner(ba,recs);bp.scrollTop=st;}
+
+  const sb=document.querySelector('.sidebar');
+  if(sb){const st=sb.scrollTop;sb.innerHTML=renderSidebarInner(recs,recent);sb.scrollTop=st;}
+
+  bindEvents();
+  updatePills();
+}
+
 function render(){
   const app=document.getElementById('app');
   try{
