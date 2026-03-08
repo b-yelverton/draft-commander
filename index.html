@@ -68,7 +68,7 @@ body{background:var(--bg);color:var(--text);font-family:'Sora',sans-serif;min-he
 .mono{font-family:'JetBrains Mono',monospace}
 
 /* Header */
-.hdr{background:var(--surface);border-bottom:2px solid var(--border);padding:12px 24px;display:flex;align-items:center;gap:16px;position:sticky;top:0;z-index:100;box-shadow:0 1px 4px rgba(28,23,16,.05)}
+.hdr{background:var(--surface);border-bottom:2px solid var(--border);padding:12px 24px;display:flex;align-items:center;gap:16px;position:sticky;top:0;z-index:100;box-shadow:0 1px 4px rgba(var(--shadow-rgb),.05)}
 .hdr-logo{font-family:'Instrument Serif',serif;font-style:italic;font-size:22px;font-weight:400;color:var(--text);letter-spacing:-.3px}
 .hdr-sub{font-size:9px;color:var(--text3);letter-spacing:3px;text-transform:uppercase;font-weight:500}
 .hdr-right{margin-left:auto;display:flex;align-items:center;gap:10px}
@@ -89,11 +89,11 @@ body{background:var(--bg);color:var(--text);font-family:'Sora',sans-serif;min-he
 .setup-form{display:flex;flex-direction:column;gap:var(--sp-md);width:100%;max-width:440px}
 .setup-row{display:flex;gap:var(--sp-sm)}
 .setup-row input,.setup-row select{flex:1;background:var(--surface);border:1px solid var(--border);border-radius:var(--radius-md);padding:var(--sp-md) var(--sp-lg);color:var(--text);font-size:14px;font-family:inherit;outline:none;transition:border-color .15s}
-.setup-row input:focus,.setup-row select:focus{border-color:var(--accent);box-shadow:0 0 0 3px rgba(184,74,28,.08)}
+.setup-row input:focus,.setup-row select:focus{border-color:var(--accent);box-shadow:0 0 0 3px rgba(var(--accent-rgb),.08)}
 .setup-row input:focus-visible,.setup-row select:focus-visible{outline:none}
 .setup-row input::placeholder{color:var(--text3)}
 .btn{background:var(--accent);border:none;border-radius:var(--radius-md);padding:var(--sp-md) var(--sp-2xl);color:#fffdf9;font-size:13px;font-weight:600;cursor:pointer;font-family:inherit;transition:all .15s;letter-spacing:.2px}
-.btn:hover{filter:brightness(1.08);transform:translateY(-1px);box-shadow:0 4px 12px rgba(184,74,28,.2)}
+.btn:hover{filter:brightness(1.08);transform:translateY(-1px);box-shadow:0 4px 12px rgba(var(--accent-rgb),.2)}
 .btn:active{transform:translateY(0);filter:brightness(.95);box-shadow:none}
 .btn:focus-visible{outline:2px solid var(--accent);outline-offset:2px}
 .btn:disabled{opacity:.4;cursor:not-allowed;transform:none;box-shadow:none;filter:none}
@@ -144,8 +144,8 @@ button,a,.p-row,.trade-chip,.fpick-chip{touch-action:manipulation}
 .room-top .draft-meta span{font-size:11px;color:var(--text3);font-family:'JetBrains Mono',monospace}
 .room-tabs{display:flex;gap:2px;background:var(--surface2);border-radius:var(--radius-md);padding:3px}
 .room-tab{padding:6px 14px;border-radius:var(--radius-sm);font-size:11px;font-weight:600;color:var(--text3);cursor:pointer;border:none;background:none;font-family:inherit;transition:all .15s;letter-spacing:.1px}
-.room-tab:hover{color:var(--text2);background:rgba(28,23,16,.03)}
-.room-tab.active{background:var(--surface);color:var(--accent);box-shadow:0 1px 3px rgba(28,23,16,.08)}
+.room-tab:hover{color:var(--text2);background:rgba(var(--shadow-rgb),.03)}
+.room-tab.active{background:var(--surface);color:var(--accent);box-shadow:0 1px 3px rgba(var(--shadow-rgb),.08)}
 .room-tab:focus-visible{outline:2px solid var(--accent);outline-offset:-1px;border-radius:var(--radius-sm)}
 .refresh-btn{background:var(--surface2);border:1px solid var(--border);border-radius:var(--radius-sm);padding:6px var(--sp-md);color:var(--text2);font-size:10px;cursor:pointer;font-family:inherit;transition:all .15s}
 .refresh-btn:hover{border-color:var(--accent);color:var(--accent)}
@@ -158,21 +158,21 @@ button,a,.p-row,.trade-chip,.fpick-chip{touch-action:manipulation}
 .section-hdr{font-size:10px;font-weight:600;color:var(--text3);letter-spacing:2px;text-transform:uppercase;padding:var(--sp-md) var(--sp-lg) var(--sp-sm);background:var(--surface);position:sticky;top:0;z-index:5;border-bottom:1px solid var(--border)}
 .pos-filters{display:flex;gap:2px;padding:var(--sp-sm) var(--sp-lg);background:var(--surface);border-bottom:1px solid var(--border);position:sticky;top:32px;z-index:4}
 .pos-filter{padding:var(--sp-xs) var(--sp-md);border-radius:var(--radius-sm);font-size:11px;font-weight:500;color:var(--text3);cursor:pointer;border:none;background:none;font-family:inherit;transition:all .15s}
-.pos-filter:hover{color:var(--text2);background:rgba(28,23,16,.02)}
+.pos-filter:hover{color:var(--text2);background:rgba(var(--shadow-rgb),.02)}
 .pos-filter.active{background:var(--surface2);color:var(--text)}
 
 /* Player rows */
 .p-row{display:flex;align-items:center;gap:var(--sp-sm);padding:var(--sp-sm) var(--sp-lg);border-bottom:1px solid var(--border);transition:background .15s;cursor:default;font-size:12px}
 .p-row:hover{background:var(--surface2)}
-.p-row.recommended{background:rgba(184,74,28,.04);border-left:3px solid var(--accent)}
-.p-row.divergent{background:rgba(180,32,32,.03)}
+.p-row.recommended{background:rgba(var(--accent-rgb),.04);border-left:3px solid var(--accent)}
+.p-row.divergent{background:rgba(var(--danger-rgb),.03)}
 .p-rank{font-family:'JetBrains Mono',monospace;color:var(--text3);width:26px;font-size:11px;text-align:right;flex-shrink:0}
 .p-pos{display:inline-block;width:28px;text-align:center;padding:2px 0;border-radius:var(--radius-sm);font-size:9px;font-weight:700;letter-spacing:.3px;font-family:'JetBrains Mono',monospace;flex-shrink:0}
-.p-QB{background:rgba(168,32,32,.1);color:var(--qb)}
-.p-RB{background:rgba(26,91,143,.1);color:var(--rb)}
-.p-WR{background:rgba(29,122,62,.1);color:var(--wr)}
-.p-TE{background:rgba(123,63,158,.1);color:var(--te)}
-.p-PICK{background:rgba(166,117,53,.1);color:var(--pick)}
+.p-QB{background:rgba(var(--qb-rgb),.1);color:var(--qb)}
+.p-RB{background:rgba(var(--rb-rgb),.1);color:var(--rb)}
+.p-WR{background:rgba(var(--wr-rgb),.1);color:var(--wr)}
+.p-TE{background:rgba(var(--te-rgb),.1);color:var(--te)}
+.p-PICK{background:rgba(var(--pick-rgb),.1);color:var(--pick)}
 .p-name{flex:1;font-weight:500;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
 .p-team{color:var(--text3);font-size:10px;width:28px;flex-shrink:0;font-family:'JetBrains Mono',monospace}
 .p-val{font-family:'JetBrains Mono',monospace;font-size:11px;width:44px;text-align:right;flex-shrink:0}
@@ -229,8 +229,8 @@ button,a,.p-row,.trade-chip,.fpick-chip{touch-action:manipulation}
 .pick-detail-cell.reach{color:var(--danger)}
 
 /* Modal */
-.modal-overlay{position:fixed;inset:0;background:rgba(28,23,16,.4);backdrop-filter:blur(2px);z-index:200;display:flex;align-items:center;justify-content:center}
-.modal{background:var(--surface);border:1px solid var(--border);border-radius:var(--radius-lg);padding:var(--sp-2xl);width:90%;max-width:520px;max-height:80vh;overflow-y:auto;box-shadow:0 20px 60px rgba(28,23,16,.12)}
+.modal-overlay{position:fixed;inset:0;background:rgba(var(--shadow-rgb),.4);backdrop-filter:blur(2px);z-index:200;display:flex;align-items:center;justify-content:center}
+.modal{background:var(--surface);border:1px solid var(--border);border-radius:var(--radius-lg);padding:var(--sp-2xl);width:90%;max-width:520px;max-height:80vh;overflow-y:auto;box-shadow:0 20px 60px rgba(var(--shadow-rgb),.12)}
 .modal h3{font-family:'Instrument Serif',serif;font-style:italic;font-size:20px;margin-bottom:16px;color:var(--text)}
 .modal textarea{width:100%;height:200px;background:var(--bg);border:1px solid var(--border);border-radius:6px;padding:12px;color:var(--text);font-size:12px;font-family:'JetBrains Mono',monospace;resize:vertical;outline:none}
 .modal textarea:focus{border-color:var(--accent)}
@@ -252,12 +252,12 @@ button,a,.p-row,.trade-chip,.fpick-chip{touch-action:manipulation}
 .trade-sides{display:flex;gap:14px;margin-bottom:14px}
 
 /* Run Alerts */
-.run-alert{background:rgba(180,32,32,.05);border:1px solid rgba(180,32,32,.15);border-radius:var(--radius-lg);padding:var(--sp-md);margin-bottom:var(--sp-sm)}
+.run-alert{background:rgba(var(--danger-rgb),.05);border:1px solid rgba(var(--danger-rgb),.15);border-radius:var(--radius-lg);padding:var(--sp-md);margin-bottom:var(--sp-sm)}
 .run-alert .run-title{font-size:11px;font-weight:600;color:var(--danger);margin-bottom:4px}
 .run-alert .run-detail{font-size:11px;color:var(--text2);line-height:1.6}
 
 /* Trade-back alert */
-.tb-alert{background:rgba(42,126,59,.05);border:1px solid rgba(42,126,59,.15);border-radius:var(--radius-lg);padding:var(--sp-md);margin-bottom:var(--sp-sm)}
+.tb-alert{background:rgba(var(--live-rgb),.05);border:1px solid rgba(var(--live-rgb),.15);border-radius:var(--radius-lg);padding:var(--sp-md);margin-bottom:var(--sp-sm)}
 .tb-alert .tb-title{font-size:11px;font-weight:600;color:var(--live);margin-bottom:4px;display:flex;align-items:center;gap:4px}
 .tb-alert .tb-detail{font-size:11px;color:var(--text2);line-height:1.7}
 .tb-alert .tb-offer{background:var(--surface2);border:1px solid var(--border);border-radius:5px;padding:8px 10px;margin-top:6px;font-family:'JetBrains Mono',monospace;font-size:10px;color:var(--text);line-height:1.6}
@@ -267,10 +267,10 @@ button,a,.p-row,.trade-chip,.fpick-chip{touch-action:manipulation}
 .opp-hdr{display:flex;align-items:center;gap:6px;margin-bottom:5px}
 .opp-name{font-size:12px;font-weight:600;flex:1}
 .opp-tag{font-size:9px;padding:2px 7px;border-radius:4px;font-family:'JetBrains Mono',monospace;font-weight:600;letter-spacing:.3px}
-.opp-tag.rebuild{background:rgba(26,91,143,.1);color:var(--rb)}
-.opp-tag.contender{background:rgba(168,32,32,.1);color:var(--qb)}
-.opp-tag.balanced{background:rgba(29,122,62,.1);color:var(--wr)}
-.opp-tag.unknown{background:rgba(158,142,124,.1);color:var(--text3)}
+.opp-tag.rebuild{background:rgba(var(--rb-rgb),.1);color:var(--rb)}
+.opp-tag.contender{background:rgba(var(--qb-rgb),.1);color:var(--qb)}
+.opp-tag.balanced{background:rgba(var(--wr-rgb),.1);color:var(--wr)}
+.opp-tag.unknown{background:rgba(var(--text3-rgb),.1);color:var(--text3)}
 .opp-bar{display:flex;height:5px;border-radius:3px;overflow:hidden;margin:5px 0}
 .opp-bar span{height:100%}
 .opp-stats{display:flex;gap:8px;font-size:10px;color:var(--text3);font-family:'JetBrains Mono',monospace}
@@ -285,8 +285,10 @@ button,a,.p-row,.trade-chip,.fpick-chip{touch-action:manipulation}
 .mc-detail{font-size:10px;color:var(--text3);margin-top:2px;font-family:'JetBrains Mono',monospace}
 
 /* Future pick chips in trade */
-.fpick-chip{display:inline-flex;align-items:center;gap:3px;background:rgba(166,117,53,.08);border:1px solid rgba(166,117,53,.25);border-radius:5px;padding:4px 8px;font-size:10px;font-family:'JetBrains Mono',monospace;color:var(--pick);margin:2px;cursor:pointer;font-weight:500;transition:all .1s}
-.fpick-chip:hover{border-color:var(--pick);background:rgba(166,117,53,.15)}
+.fpick-chip{display:inline-flex;align-items:center;gap:3px;background:rgba(var(--pick-rgb),.08);border:1px solid rgba(var(--pick-rgb),.25);border-radius:5px;padding:4px 8px;font-size:10px;font-family:'JetBrains Mono',monospace;color:var(--pick);margin:2px;cursor:pointer;font-weight:500;transition:all .1s}
+.fpick-chip:hover{border-color:var(--pick);background:rgba(var(--pick-rgb),.15)}
+.fpick-chip-recv{border-color:var(--live);color:var(--live)}
+.trade-chip-pick{border-color:var(--pick)}
 
 /* Draft Selector */
 .draft-select{display:flex;flex-direction:column;align-items:center;min-height:calc(100vh - 52px);padding:var(--sp-3xl) var(--sp-xl)}
@@ -296,28 +298,28 @@ button,a,.p-row,.trade-chip,.fpick-chip{touch-action:manipulation}
 .draft-select .back-link:hover{color:var(--text)}
 .draft-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(min(320px,100%),1fr));gap:10px;width:100%;max-width:1000px}
 .draft-card{background:var(--surface);border:1px solid var(--border);border-radius:var(--radius-lg);padding:var(--sp-lg);cursor:pointer;transition:all .15s}
-.draft-card:hover{border-color:var(--accent);transform:translateY(-2px);box-shadow:0 6px 20px rgba(28,23,16,.08)}
+.draft-card:hover{border-color:var(--accent);transform:translateY(-2px);box-shadow:0 6px 20px rgba(var(--shadow-rgb),.08)}
 .draft-card.live{border-color:var(--live);box-shadow:0 0 0 1px var(--live)}
 .draft-card .dc-top{display:flex;align-items:center;gap:8px;margin-bottom:8px}
 .draft-card .dc-status{font-size:9px;padding:2px 8px;border-radius:4px;font-family:'JetBrains Mono',monospace;font-weight:600;letter-spacing:.3px}
-.draft-card .dc-status.drafting{background:rgba(42,126,59,.1);color:var(--live)}
-.draft-card .dc-status.pre_draft{background:rgba(184,74,28,.1);color:var(--accent)}
-.draft-card .dc-status.complete{background:rgba(158,142,124,.1);color:var(--text3)}
+.draft-card .dc-status.drafting{background:rgba(var(--live-rgb),.1);color:var(--live)}
+.draft-card .dc-status.pre_draft{background:rgba(var(--accent-rgb),.1);color:var(--accent)}
+.draft-card .dc-status.complete{background:rgba(var(--text3-rgb),.1);color:var(--text3)}
 .draft-card .dc-name{font-size:14px;font-weight:600;flex:1;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
 .draft-card .dc-meta{display:flex;gap:10px;font-size:11px;color:var(--text2);margin-bottom:6px;flex-wrap:wrap}
 .draft-card .dc-meta span{display:flex;align-items:center;gap:3px}
 .draft-card .dc-tags{display:flex;gap:4px;flex-wrap:wrap}
 .draft-card .dc-tag{font-size:9px;padding:2px 7px;border-radius:4px;font-family:'JetBrains Mono',monospace;background:var(--surface2);color:var(--text3);border:1px solid var(--border);font-weight:500}
-.draft-card .dc-tag.sf{color:var(--qb);border-color:rgba(168,32,32,.2)}
-.draft-card .dc-tag.tep{color:var(--te);border-color:rgba(123,63,158,.2)}
-.draft-card .dc-tag.dyn{color:var(--accent);border-color:rgba(184,74,28,.2)}
+.draft-card .dc-tag.sf{color:var(--qb);border-color:rgba(var(--qb-rgb),.2)}
+.draft-card .dc-tag.tep{color:var(--te);border-color:rgba(var(--te-rgb),.2)}
+.draft-card .dc-tag.dyn{color:var(--accent);border-color:rgba(var(--accent-rgb),.2)}
 .draft-card .dc-progress{height:3px;background:var(--surface2);border-radius:2px;margin-top:8px;overflow:hidden}
 .draft-card .dc-progress-bar{height:100%;border-radius:2px;background:var(--accent);transition:width .3s}
 .draft-year-hdr{font-size:10px;font-weight:600;color:var(--text3);letter-spacing:2px;text-transform:uppercase;padding:var(--sp-md) 0 var(--sp-sm);width:100%;max-width:1000px}
 
 /* Tip jar */
 .tip-btn{display:inline-flex;align-items:center;gap:5px;background:var(--surface2);border:1px solid var(--border);border-radius:var(--radius-sm);padding:5px 10px;font-size:10px;font-weight:600;color:var(--accent2);cursor:pointer;font-family:inherit;transition:all .15s;text-decoration:none;letter-spacing:.2px;white-space:nowrap}
-.tip-btn:hover{border-color:var(--accent2);background:rgba(166,117,53,.08);color:var(--accent2);transform:translateY(-1px)}
+.tip-btn:hover{border-color:var(--accent2);background:rgba(var(--pick-rgb),.08);color:var(--accent2);transform:translateY(-1px)}
 .tip-btn:active{transform:translateY(0)}
 .tip-btn .tip-icon{font-size:13px;line-height:1}
 .tip-cta{display:flex;align-items:center;gap:var(--sp-md);background:var(--surface);border:1px solid var(--border);border-radius:var(--radius-lg);padding:var(--sp-lg);margin-top:var(--sp-2xl);max-width:440px;width:100%}
@@ -357,12 +359,12 @@ button,a,.p-row,.trade-chip,.fpick-chip{touch-action:manipulation}
 .run-alert,.tb-alert{animation:cardIn .3s var(--ease-out-quart) both}
 
 /* On the clock — pulse glow on room-top */
-@keyframes clockPulse{0%,100%{box-shadow:inset 0 -2px 0 var(--accent)}50%{box-shadow:inset 0 -2px 0 var(--accent),0 2px 16px rgba(184,74,28,.12)}}
+@keyframes clockPulse{0%,100%{box-shadow:inset 0 -2px 0 var(--accent)}50%{box-shadow:inset 0 -2px 0 var(--accent),0 2px 16px rgba(var(--accent-rgb),.12)}}
 .room-top.on-clock{animation:clockPulse 2s ease-in-out infinite;border-bottom-color:var(--accent)}
 .room-top.on-clock .pick-clock{color:var(--accent)}
 
 /* Pick log new-pick flash */
-@keyframes pickFlash{from{background:rgba(184,74,28,.08)}to{background:transparent}}
+@keyframes pickFlash{from{background:rgba(var(--accent-rgb),.08)}to{background:transparent}}
 .log-row:first-child{animation:pickFlash .8s var(--ease-out-quart)}
 
 /* Draft card entrance stagger */
@@ -374,14 +376,14 @@ button,a,.p-row,.trade-chip,.fpick-chip{touch-action:manipulation}
 
 /* Live draft card pulse border */
 .draft-card.live{animation:cardSlide .4s var(--ease-out-expo) both,liveBorder 2.5s ease-in-out infinite .4s}
-@keyframes liveBorder{0%,100%{box-shadow:0 0 0 1px var(--live)}50%{box-shadow:0 0 0 1px var(--live),0 0 12px rgba(42,126,59,.1)}}
+@keyframes liveBorder{0%,100%{box-shadow:0 0 0 1px var(--live)}50%{box-shadow:0 0 0 1px var(--live),0 0 12px rgba(var(--live-rgb),.1)}}
 
 /* Recommendation highlight shimmer on hover */
 .sb-rec:hover{border-color:var(--accent);transition:border-color .2s}
 
 /* Opponent card expand feel */
 .opp-card{transition:transform .15s var(--ease-out-quart),box-shadow .15s}
-.opp-card:hover{transform:translateY(-1px);box-shadow:0 2px 8px rgba(28,23,16,.06)}
+.opp-card:hover{transform:translateY(-1px);box-shadow:0 2px 8px rgba(var(--shadow-rgb),.06)}
 
 /* Monte Carlo bar fill animation */
 @keyframes barGrow{from{width:0}to{width:var(--bar-w,0)}}
@@ -410,7 +412,7 @@ button,a,.p-row,.trade-chip,.fpick-chip{touch-action:manipulation}
 
 /* Shimmer skeleton loading */
 @keyframes shimmer{0%{background-position:-200px 0}100%{background-position:200px 0}}
-.skeleton{background:linear-gradient(90deg,var(--surface2) 25%,#e8e0d5 50%,var(--surface2) 75%);background-size:400px 100%;animation:shimmer 1.5s ease-in-out infinite;border-radius:var(--radius-md)}
+.skeleton{background:linear-gradient(90deg,var(--surface2) 25%,var(--shimmer) 50%,var(--surface2) 75%);background-size:400px 100%;animation:shimmer 1.5s ease-in-out infinite;border-radius:var(--radius-md)}
 .skeleton-card{height:80px;margin-bottom:var(--sp-sm);border-radius:var(--radius-lg)}
 .skeleton-row{height:28px;margin-bottom:var(--sp-xs);border-radius:var(--radius-sm)}
 .val-pending{color:var(--text3);opacity:0.4}
@@ -1350,7 +1352,7 @@ function renderTradeEvalEnhanced(numTeams){
     
     <div style="margin-bottom:12px">
       <div style="font-size:10px;color:var(--text3);margin-bottom:4px">Quick add future picks:</div>
-      <div style="display:flex;flex-wrap:wrap;gap:3px">${futurePickExamples.map(fp=>`<span class="fpick-chip" data-fp-send="${fp}">${fp} →Send</span><span class="fpick-chip" data-fp-recv="${fp}" style="border-color:rgba(63,185,80,.3);color:var(--live)">${fp} →Recv</span>`).join('')}</div>
+      <div style="display:flex;flex-wrap:wrap;gap:3px">${futurePickExamples.map(fp=>`<span class="fpick-chip" data-fp-send="${fp}">${fp} →Send</span><span class="fpick-chip" data-fp-recv="${fp}" class="fpick-chip-recv">${fp} →Recv</span>`).join('')}</div>
     </div>
     
     <div class="trade-sides">
@@ -1362,7 +1364,7 @@ function renderTradeEvalEnhanced(numTeams){
         </div>
         <div>${t.send.map((item,i)=>{
           const fp=getFuturePickValue(item);
-          if(fp)return`<div class="trade-chip" style="border-color:rgba(210,153,34,.3)"><span style="color:var(--pick)">${fp.label}</span><span style="color:var(--text3);font-size:9px">(${fp.value.toLocaleString()})</span><span class="x" data-trade-rm="send-${i}">✕</span></div>`;
+          if(fp)return`<div class="trade-chip" class="trade-chip-pick"><span style="color:var(--pick)">${fp.label}</span><span style="color:var(--text3);font-size:9px">(${fp.value.toLocaleString()})</span><span class="x" data-trade-rm="send-${i}">✕</span></div>`;
           const overall=parsePick(item,numTeams);const r=overall?Math.ceil(overall/numTeams):0;const ip=overall?((overall-1)%numTeams)+1:0;
           const exp=overall?getExpectedPlayerAtPick(overall):null;
           return`<div class="trade-chip"><span class="mono">${r}.${String(ip).padStart(2,'0')}</span>${exp?` <span style="color:var(--text3)">≈ ${exp.name}</span>`:''}<span class="x" data-trade-rm="send-${i}">✕</span></div>`;
@@ -1377,7 +1379,7 @@ function renderTradeEvalEnhanced(numTeams){
         </div>
         <div>${t.receive.map((item,i)=>{
           const fp=getFuturePickValue(item);
-          if(fp)return`<div class="trade-chip" style="border-color:rgba(210,153,34,.3)"><span style="color:var(--pick)">${fp.label}</span><span style="color:var(--text3);font-size:9px">(${fp.value.toLocaleString()})</span><span class="x" data-trade-rm="receive-${i}">✕</span></div>`;
+          if(fp)return`<div class="trade-chip" class="trade-chip-pick"><span style="color:var(--pick)">${fp.label}</span><span style="color:var(--text3);font-size:9px">(${fp.value.toLocaleString()})</span><span class="x" data-trade-rm="receive-${i}">✕</span></div>`;
           const overall=parsePick(item,numTeams);const r=overall?Math.ceil(overall/numTeams):0;const ip=overall?((overall-1)%numTeams)+1:0;
           const exp=overall?getExpectedPlayerAtPick(overall):null;
           return`<div class="trade-chip"><span class="mono">${r}.${String(ip).padStart(2,'0')}</span>${exp?` <span style="color:var(--text3)">≈ ${exp.name}</span>`:''}<span class="x" data-trade-rm="receive-${i}">✕</span></div>`;
