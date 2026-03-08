@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="en" data-theme="light">
+<html lang="en" data-theme="light" class="no-transitions">
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -10,6 +10,7 @@
   var t=localStorage.getItem('theme');
   if(!t)t=matchMedia('(prefers-color-scheme:dark)').matches?'dark':'light';
   document.documentElement.setAttribute('data-theme',t);
+  document.documentElement.className='no-transitions';
 })();
 </script>
 <style>
@@ -117,6 +118,7 @@ body{background:var(--bg);color:var(--text);font-family:'Sora',sans-serif;min-he
 .hdr-right .tip-btn{display:none}
 .hdr-sub{display:none}
 .hdr-right{gap:8px}
+.theme-toggle{min-height:44px;min-width:44px}
 .room-top{padding:var(--sp-sm) var(--sp-md);gap:var(--sp-sm);flex-direction:column;align-items:stretch}
 .room-top .draft-meta{margin-left:0;flex-wrap:wrap;justify-content:flex-start}
 .room-tabs{overflow-x:auto;-webkit-overflow-scrolling:touch;scroll-snap-type:x mandatory;scrollbar-width:none;-ms-overflow-style:none}
@@ -328,6 +330,17 @@ button,a,.p-row,.trade-chip,.fpick-chip{touch-action:manipulation}
 .tip-cta .tip-cta-text .tip-cta-sub{font-size:11px;color:var(--text3);line-height:1.5}
 .tip-cta .tip-btn{padding:8px 16px;font-size:11px}
 
+/* Theme toggle */
+.theme-toggle{background:var(--surface2);border:1px solid var(--border);border-radius:var(--radius-sm);padding:5px 8px;cursor:pointer;font-size:14px;line-height:1;transition:all .15s;color:var(--text2);display:inline-flex;align-items:center;justify-content:center}
+.theme-toggle:hover{border-color:var(--accent2);color:var(--text)}
+
+/* Smooth theme transitions */
+body,.hdr,.sidebar,.board-panel,.room-top,.sb-section,.sb-rec,.p-row,.setup,.draft-card,.modal,.trade-side,.pos-filter,.room-tab,.opp-card,.chart-panel,.chart-stat,.trade-verdict,.section-hdr,.pos-filters,.loading,.draft-select,.tip-cta,.tip-btn,.run-alert,.tb-alert,.mc-bar-track,.pick-detail-cell,.pick-detail-hdr,.trade-chip,.fpick-chip,.weight-row,.src-pill,.my-pick,.err,.hint,.btn,.btn-ghost,.refresh-btn,.empty-state{
+  transition:background-color .25s ease,color .25s ease,border-color .25s ease;
+}
+/* Suppress transitions on initial load */
+.no-transitions,.no-transitions *,.no-transitions *::before,.no-transitions *::after{transition:none!important}
+
 /* Empty states */
 .empty-state{padding:48px 24px;text-align:center}
 .empty-state h3{font-family:'Instrument Serif',serif;font-style:italic;font-size:22px;color:var(--text);margin-bottom:var(--sp-sm);font-weight:400}
@@ -430,6 +443,7 @@ input:focus-visible,textarea:focus-visible,select:focus-visible{outline:none}
     <div class="hdr-sub">Live Draft Assistant</div>
   </div>
   <div class="hdr-right">
+    <button class="theme-toggle" id="themeToggle" onclick="toggleTheme()" aria-label="Toggle dark mode"></button>
     <div class="src-pills" id="srcPills"></div>
     <a class="tip-btn" href="https://buymeacoffee.com/northofzero" target="_blank" rel="noopener"><span class="tip-icon">&#9749;</span>Tip Jar</a>
     <button class="refresh-btn" id="switchDraftBtn" style="display:none">Switch Draft</button>
@@ -441,6 +455,33 @@ input:focus-visible,textarea:focus-visible,select:focus-visible{outline:none}
 </div>
 <div id="app"></div>
 <script>
+// Theme toggle
+function toggleTheme(){
+  const h=document.documentElement;
+  const next=h.getAttribute('data-theme')==='dark'?'light':'dark';
+  h.setAttribute('data-theme',next);
+  localStorage.setItem('theme',next);
+  updateThemeIcon();
+}
+function updateThemeIcon(){
+  const btn=document.getElementById('themeToggle');
+  if(btn)btn.textContent=document.documentElement.getAttribute('data-theme')==='dark'?'\u2600\uFE0F':'\uD83C\uDF19';
+}
+// System preference listener (only when no localStorage override)
+window.matchMedia('(prefers-color-scheme:dark)').addEventListener('change',e=>{
+  if(!localStorage.getItem('theme')){
+    document.documentElement.setAttribute('data-theme',e.matches?'dark':'light');
+    updateThemeIcon();
+  }
+});
+// Initialize icon and remove no-transitions class
+document.addEventListener('DOMContentLoaded',()=>{
+  updateThemeIcon();
+  requestAnimationFrame(()=>{
+    document.documentElement.classList.remove('no-transitions');
+  });
+});
+
 const SLEEPER='https://api.sleeper.app/v1';
 const FC_API='https://api.fantasycalc.com/values/current';
 const KTC_PROXIES=['https://api.codetabs.com/v1/proxy?quest=','https://corsproxy.io/?','https://api.allorigins.win/raw?url='];
