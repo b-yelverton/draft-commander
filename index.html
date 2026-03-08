@@ -76,13 +76,20 @@ body{background:var(--bg);color:var(--text);font-family:'Sora',sans-serif;min-he
 .room-top .draft-meta{margin-left:0;flex-wrap:wrap;justify-content:flex-start}
 .room-tabs{overflow-x:auto;-webkit-overflow-scrolling:touch;scroll-snap-type:x mandatory;scrollbar-width:none;-ms-overflow-style:none}
 .room-tabs::-webkit-scrollbar{display:none}
-.room-tab{flex-shrink:0;scroll-snap-align:start}
+.room-tab{flex-shrink:0;scroll-snap-align:start;min-height:44px;padding:10px 14px;display:inline-flex;align-items:center;justify-content:center}
 .trade-sides{flex-direction:column;gap:var(--sp-md)}
 .trade-sides>div:nth-child(2){align-self:center}
 .setup{padding:var(--sp-xl) var(--sp-md)}
 .draft-select{padding:var(--sp-xl) var(--sp-md)}
 .tip-cta{flex-direction:column;text-align:center}
 .tip-cta .tip-btn{align-self:center}
+.pos-filter,.refresh-btn,.btn,.btn-sm{min-height:44px;display:inline-flex;align-items:center;justify-content:center}
+.pos-filter{padding:10px var(--sp-md)}
+.p-row{min-height:44px}
+.trade-chip,.fpick-chip{min-height:44px;display:inline-flex;align-items:center}
+.trade-input input{min-height:44px}
+.weight-row input[type=range]{height:44px}
+button,a,.p-row,.trade-chip,.fpick-chip{touch-action:manipulation}
 }
 .room-top{grid-column:1/-1;background:var(--surface);border-bottom:2px solid var(--border);padding:var(--sp-md) var(--sp-xl);display:flex;align-items:center;gap:var(--sp-lg);flex-wrap:wrap}
 .room-top .pick-clock{font-family:'Instrument Serif',serif;font-style:italic;font-size:22px;font-weight:400;color:var(--text)}
