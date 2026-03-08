@@ -1017,6 +1017,48 @@ function renderDraftSelect(){
   </div>`;
 }
 
+function renderSidebarInner(recs,recent){
+  const teams=S.draft?.settings?.teams||12;
+  return`<div class="sb-section">
+        <div class="sb-title">⚡ Recommendations</div>
+        ${(()=>{const runs=detectRuns(5);return runs.length?runs.map(r=>`<div class="run-alert">
+          <div class="run-title">🔥 ${r.pos} RUN — ${r.count} in last ${r.lookback} picks</div>
+          <div class="run-detail">${r.players.join(', ')}<br>${r.remaining} ${r.pos}s left · Best: ${r.nextBest}${r.tier1Left>0?` · ${r.tier1Left} in top 30`:''}</div>
+        </div>`).join(''):'';})()}
+        ${(()=>{const tbs=getTradeBackOpportunities();return tbs.length?tbs.map(tb=>{
+          if(tb.type==='flat-tier')return`<div class="tb-alert">
+            <div class="tb-title">↕ FLAT TIER — ${tb.tierSize} players</div>
+            <div class="tb-detail">Next ${tb.tierSize} available (${tb.tierPositions}) are in the same tier. ${tb.bestInTier} through ${tb.worstInTier}.</div>
+            <div class="tb-offer">${tb.suggestion}</div>
+          </div>`;
+          if(tb.type==='cliff-warning')return`<div class="run-alert">
+            <div class="run-title">⚡ CLIFF AHEAD — ${tb.cliffSize} rank drop</div>
+            <div class="run-detail">${tb.msg}</div>
+          </div>`;
+          return'';
+        }).join(''):'';})()}
+        ${recs.length?recs.map(r=>`<div class="sb-rec">
+          <div class="label">${r.label}</div>
+          <div class="player"><span class="p-pos p-${r.player.position}" style="margin-right:6px">${r.player.position}</span>${r.player.name}</div>
+          <div class="reason">${r.reason}</div>
+        </div>`).join(''):(['ktc','dd','dp'].some(k=>S.sources[k].status==='loading'||S.sources[k].status==='idle')?'<div class="skeleton skeleton-card" style="opacity:1"></div><div class="skeleton skeleton-card" style="opacity:0.7"></div><div class="skeleton skeleton-card" style="opacity:0.4;height:60px"></div>':'<div style="font-size:12px;color:var(--text2);line-height:1.6;padding:8px 0"><span style="color:var(--text3)">No recommendations yet.</span><br><span style="font-size:11px;color:var(--text3)">BPA recommendations appear once FantasyCalc data loads.</span></div>')}
+      </div>
+      <div class="sb-section">
+        <div class="sb-title">📋 Recent Picks</div>
+        <div class="draft-log">${recent.map(p=>{const info=resolvePlayer(p.player_id);const pn=p.pick_no;const r=Math.ceil(pn/teams),ip=((pn-1)%teams)+1;const isPP=info?.isRookiePick;
+          return`<div class="log-row"><span class="log-pick">${r}.${String(ip).padStart(2,'0')}</span><span class="p-pos p-${isPP?'PICK':(info?.position||'?')}" style="font-size:9px">${isPP?'PICK':(info?.position||'?')}</span><span class="log-name" ${isPP?'style="color:var(--pick)"':''}>${info?.name||p.player_id}</span><span class="log-owner">${getOwnerName(p.picked_by)}</span></div>`;}).join('')}</div>
+      </div>
+      <div class="sb-section">
+        <div class="sb-title">📊 Scarcity</div>
+        ${S.sources.fc.status!=='live'?'<div class="skeleton skeleton-row"></div><div class="skeleton skeleton-row"></div><div class="skeleton skeleton-row"></div><div class="skeleton skeleton-row"></div>':['QB','RB','WR','TE'].map(pos=>{const a=getBestAvailable(pos);const gap=a.length>5?(a[5].compositeRank-a[0].compositeRank):0;
+          return`<div style="display:flex;align-items:center;gap:6px;padding:3px 0;border-bottom:1px solid var(--border)">
+            <span class="p-pos p-${pos}">${pos}</span><span style="font-size:10px;flex:1">${a[0]?.name||'—'}</span>
+            <span style="font-size:9px;color:var(--text3)" class="mono">${a.length} left</span>
+            ${gap>40?`<span style="font-size:9px;color:var(--danger)" class="mono">⚠ cliff</span>`:''}
+          </div>`;}).join('')}
+      </div>`;
+}
+
 function renderRoom(){
   if(!S.draft)return renderLoading();
   const teams=S.draft.settings?.teams||12,total=S.picks.length;
@@ -1057,55 +1099,15 @@ function renderRoom(){
       S.roomTab==='scarcity'?`<div class="chart-panel">${renderScarcitySim()}</div>`:
       `<div class="chart-panel">${renderSourcesPanel()}</div>`}
 
-    <div class="sidebar">
-      <div class="sb-section">
-        <div class="sb-title">⚡ Recommendations</div>
-        ${(()=>{const runs=detectRuns(5);return runs.length?runs.map(r=>`<div class="run-alert">
-          <div class="run-title">🔥 ${r.pos} RUN — ${r.count} in last ${r.lookback} picks</div>
-          <div class="run-detail">${r.players.join(', ')}<br>${r.remaining} ${r.pos}s left · Best: ${r.nextBest}${r.tier1Left>0?` · ${r.tier1Left} in top 30`:''}</div>
-        </div>`).join(''):'';})()}
-        ${(()=>{const tbs=getTradeBackOpportunities();return tbs.length?tbs.map(tb=>{
-          if(tb.type==='flat-tier')return`<div class="tb-alert">
-            <div class="tb-title">↕ FLAT TIER — ${tb.tierSize} players</div>
-            <div class="tb-detail">Next ${tb.tierSize} available (${tb.tierPositions}) are in the same tier. ${tb.bestInTier} through ${tb.worstInTier}.</div>
-            <div class="tb-offer">${tb.suggestion}</div>
-          </div>`;
-          if(tb.type==='cliff-warning')return`<div class="run-alert">
-            <div class="run-title">⚡ CLIFF AHEAD — ${tb.cliffSize} rank drop</div>
-            <div class="run-detail">${tb.msg}</div>
-          </div>`;
-          return'';
-        }).join(''):'';})()}
-        ${recs.length?recs.map(r=>`<div class="sb-rec">
-          <div class="label">${r.label}</div>
-          <div class="player"><span class="p-pos p-${r.player.position}" style="margin-right:6px">${r.player.position}</span>${r.player.name}</div>
-          <div class="reason">${r.reason}</div>
-        </div>`).join(''):(['ktc','dd','dp'].some(k=>S.sources[k].status==='loading'||S.sources[k].status==='idle')?'<div class="skeleton skeleton-card" style="opacity:1"></div><div class="skeleton skeleton-card" style="opacity:0.7"></div><div class="skeleton skeleton-card" style="opacity:0.4;height:60px"></div>':'<div style="font-size:12px;color:var(--text2);line-height:1.6;padding:8px 0"><span style="color:var(--text3)">No recommendations yet.</span><br><span style="font-size:11px;color:var(--text3)">BPA recommendations appear once FantasyCalc data loads.</span></div>')}
-      </div>
-      <div class="sb-section">
-        <div class="sb-title">📋 Recent Picks</div>
-        <div class="draft-log">${recent.map(p=>{const info=resolvePlayer(p.player_id);const pn=p.pick_no;const r=Math.ceil(pn/teams),ip=((pn-1)%teams)+1;const isPP=info?.isRookiePick;
-          return`<div class="log-row"><span class="log-pick">${r}.${String(ip).padStart(2,'0')}</span><span class="p-pos p-${isPP?'PICK':(info?.position||'?')}" style="font-size:9px">${isPP?'PICK':(info?.position||'?')}</span><span class="log-name" ${isPP?'style="color:var(--pick)"':''}>${info?.name||p.player_id}</span><span class="log-owner">${getOwnerName(p.picked_by)}</span></div>`;}).join('')}</div>
-      </div>
-      <div class="sb-section">
-        <div class="sb-title">📊 Scarcity</div>
-        ${S.sources.fc.status!=='live'?'<div class="skeleton skeleton-row"></div><div class="skeleton skeleton-row"></div><div class="skeleton skeleton-row"></div><div class="skeleton skeleton-row"></div>':['QB','RB','WR','TE'].map(pos=>{const a=getBestAvailable(pos);const gap=a.length>5?(a[5].compositeRank-a[0].compositeRank):0;
-          return`<div style="display:flex;align-items:center;gap:6px;padding:3px 0;border-bottom:1px solid var(--border)">
-            <span class="p-pos p-${pos}">${pos}</span><span style="font-size:10px;flex:1">${a[0]?.name||'—'}</span>
-            <span style="font-size:9px;color:var(--text3)" class="mono">${a.length} left</span>
-            ${gap>40?`<span style="font-size:9px;color:var(--danger)" class="mono">⚠ cliff</span>`:''}
-          </div>`;}).join('')}
-      </div>
-    </div>
+    <div class="sidebar">${renderSidebarInner(recs,recent)}</div>
   </div>`;
 }
 
-function renderBoard(ba,recs,teams,recent){
+function renderBoardInner(ba,recs){
   const hasKtc=S.sources.ktc.status==='live';
   const hasDd=S.sources.dd.status==='live';
   const hasDp=S.sources.dp.status==='live';
-  return`<div class="board-panel">
-    <div class="section-hdr">Best Available${ba.length?` (${ba.length})`:''}</div>
+  return`<div class="section-hdr">Best Available${ba.length?` (${ba.length})`:''}</div>
     <div class="pos-filters">
       ${['ALL','QB','RB','WR','TE'].map(p=>`<button class="pos-filter ${S.posFilter===p?'active':''}" data-pos="${p}">${p}</button>`).join('')}
       <span style="flex:1"></span>
@@ -1143,8 +1145,11 @@ function renderBoard(ba,recs,teams,recent){
         <span class="p-val dd" style="width:36px">${hasDd?(p.ddRank?'#'+p.ddRank:'--'):'<span class="val-pending">--</span>'}</span>
         <span class="p-val dp" style="width:36px">${hasDp?(p.dpRank?'#'+Math.round(p.dpRank):'--'):'<span class="val-pending">--</span>'}</span>
         ${rankDeltaHtml}
-      </div>`;}).join('')}
-  </div>`;
+      </div>`;}).join('')}`;
+}
+
+function renderBoard(ba,recs,teams,recent){
+  return`<div class="board-panel">${renderBoardInner(ba,recs)}</div>`;
 }
 
 function renderSourcesPanel(){
