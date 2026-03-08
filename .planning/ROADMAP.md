@@ -7,7 +7,7 @@
 
 ## Phases
 
-- [ ] **Phase 1: Loading Stability** - Fix visual overflow and layout shift caused by background source loading
+- [x] **Phase 1: Loading Stability** - Fix visual overflow and layout shift caused by background source loading
 - [ ] **Phase 2: Mobile Layout** - Restructure room view and non-room screens for phone and tablet viewports
 - [ ] **Phase 3: Mobile Component Polish** - Adapt header, tabs, and interactive elements for mobile usability
 
@@ -25,7 +25,7 @@
 **Plans:** 2 plans
 Plans:
 - [x] 01-01-PLAN.md -- Stabilize board columns and add skeleton loading placeholders
-- [ ] 01-02-PLAN.md -- Targeted subtree updates with rAF batching for source loaders
+- [x] 01-02-PLAN.md -- Targeted subtree updates with rAF batching for source loaders
 
 ### Phase 2: Mobile Layout
 **Goal**: Room view and all pre-room screens are usable on phone and tablet viewports without horizontal scrolling or content clipping
@@ -51,7 +51,7 @@ Plans:
 
 | Phase | Plans Complete | Status | Completed |
 |-------|---------------|--------|-----------|
-| 1. Loading Stability | 1/2 | Executing | - |
+| 1. Loading Stability | 2/2 | Complete | 2026-03-08 |
 | 2. Mobile Layout | 0/? | Not started | - |
 | 3. Mobile Component Polish | 0/? | Not started | - |
 

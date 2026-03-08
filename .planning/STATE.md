@@ -3,12 +3,12 @@ gsd_state_version: 1.0
 milestone: v1.0
 milestone_name: milestone
 status: executing
-last_updated: "2026-03-08T05:06:37Z"
+last_updated: "2026-03-08T05:11:53Z"
 progress:
   total_phases: 3
-  completed_phases: 0
+  completed_phases: 1
   total_plans: 2
-  completed_plans: 1
+  completed_plans: 2
 ---
 
 # Project State: Draft Commander
@@ -19,16 +19,17 @@ progress:
 **Architecture:** Single-file static app (index.html ~1970 lines), vanilla JS, no build step, Vercel deployment
 
 ## Current Position
-**Phase:** 01-loading-stability
-**Plan:** 01-02 (next)
-**Status:** Plan 01-01 complete, proceeding to 01-02
-**Progress:** [#.........] 1/2 plans in phase 1
+**Phase:** 01-loading-stability (complete)
+**Plan:** 02-02 (next phase)
+**Status:** Phase 01 complete (2/2 plans), ready for Phase 02
+**Progress:** [##########] 2/2 plans in phase 1
 
 ## Performance Metrics
-- Phases completed: 0/3
-- Plans completed: 1/2 (phase 1)
-- Requirements delivered: 3/10 (LOAD-01, LOAD-02, LOAD-03)
+- Phases completed: 1/3
+- Plans completed: 2/2 (phase 1)
+- Requirements delivered: 5/10 (LOAD-01, LOAD-02, LOAD-03, LOAD-04)
 - Plan 01-01 duration: 102s (2 tasks, 1 file modified)
+- Plan 01-02 duration: 193s (2 tasks, 1 file modified)
 
 ## Accumulated Context
 
@@ -40,10 +41,13 @@ progress:
 | Non-room screens grouped with mobile layout | MOBI-06 is structural CSS work like MOBI-01/02, not component polish. Natural delivery boundary. |
 | "--" with val-pending class for pending columns | Consistent with existing em-dash pattern, clear visual distinction from loaded data |
 | 3 skeleton cards with decreasing opacity | Visual depth cue (1.0, 0.7, 0.4) signals loading state without being disruptive |
+| renderSidebarInner computes teams internally | Keeps call sites simple, S.draft is always available when sidebar renders |
+| updatePills() before scheduleRoomUpdate() | Pills update synchronously (outside #app), room content batches via rAF |
 
 ### Technical Context
-- Current rendering: full DOM re-render via innerHTML on every state change
-- Phase 1 introduces targeted subtree updates (scheduleUpdate with rAF batching)
+- Source loaders now use targeted subtree updates via scheduleRoomUpdate() with rAF batching
+- renderBoardInner() and renderSidebarInner() enable surgical DOM updates without full re-render
+- Scroll position preserved in board panel and sidebar during source-arrival updates
 - Current responsive: single @media(max-width:1000px) breakpoint
 - Phase 2 flips to mobile-first min-width breakpoints (600px, 1000px)
 - Room grid: CSS Grid 1fr 340px with 340px sidebar
@@ -52,12 +56,12 @@ progress:
 None
 
 ### TODOs
-- Execute Plan 01-02 (targeted subtree updates with rAF batching)
+- Begin Phase 02 execution
 
 ## Session Continuity
-**Last session:** 2026-03-08T05:06:37Z
-**Stopped at:** Completed 01-01-PLAN.md
-**Next action:** Execute Plan 01-02 (targeted subtree updates)
+**Last session:** 2026-03-08T05:11:53Z
+**Stopped at:** Completed 01-02-PLAN.md (Phase 01 complete)
+**Next action:** Begin Phase 02 execution
 
 ---
 *State initialized: 2026-03-08*
