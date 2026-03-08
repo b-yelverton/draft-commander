@@ -16,8 +16,8 @@ Requirements for this milestone. Each maps to roadmap phases.
 
 ### Mobile Layout
 
-- [ ] **MOBI-01**: Room view uses single-column layout on phone viewports (< 600px) with sidebar content below the main panel
-- [ ] **MOBI-02**: Room view uses adapted layout on tablet viewports (600px–1000px) with appropriate content stacking
+- [x] **MOBI-01**: Room view uses single-column layout on phone viewports (< 600px) with sidebar content below the main panel
+- [x] **MOBI-02**: Room view uses adapted layout on tablet viewports (600px–1000px) with appropriate content stacking
 - [ ] **MOBI-03**: Header collapses on mobile — source pills hidden, shows logo and live indicator only
 - [ ] **MOBI-04**: Room tabs are horizontally scrollable on narrow viewports without overflow
 - [ ] **MOBI-05**: All interactive elements (buttons, tabs, filters) meet 44px minimum touch target on mobile viewports
@@ -60,8 +60,8 @@ Which phases cover which requirements. Updated during roadmap creation.
 | LOAD-02 | Phase 1 | Complete |
 | LOAD-03 | Phase 1 | Complete |
 | LOAD-04 | Phase 1 | Complete |
-| MOBI-01 | Phase 2 | Pending |
-| MOBI-02 | Phase 2 | Pending |
+| MOBI-01 | Phase 2 | Complete |
+| MOBI-02 | Phase 2 | Complete |
 | MOBI-03 | Phase 3 | Pending |
 | MOBI-04 | Phase 3 | Pending |
 | MOBI-05 | Phase 3 | Pending |

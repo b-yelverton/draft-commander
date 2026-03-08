@@ -37,7 +37,7 @@ Plans:
   3. User on a phone can navigate through the setup screen, loading screen, and draft selection screen without any element overflowing the viewport or requiring horizontal scroll
 **Plans:** 2 plans
 Plans:
-- [ ] 02-01-PLAN.md -- Room grid mobile-first restructure with sidebar stacking and trade evaluator adaptation
+- [x] 02-01-PLAN.md -- Room grid mobile-first restructure with sidebar stacking and trade evaluator adaptation
 - [ ] 02-02-PLAN.md -- Non-room screen mobile adaptation (draft grid, setup, loading)
 
 ### Phase 3: Mobile Component Polish
@@ -55,7 +55,7 @@ Plans:
 | Phase | Plans Complete | Status | Completed |
 |-------|---------------|--------|-----------|
 | 1. Loading Stability | 2/2 | Complete | 2026-03-08 |
-| 2. Mobile Layout | 0/2 | Not started | - |
+| 2. Mobile Layout | 1/2 | In progress | - |
 | 3. Mobile Component Polish | 0/? | Not started | - |
 
 ---
