@@ -9,7 +9,7 @@
 
 - [x] **Phase 1: Loading Stability** - Fix visual overflow and layout shift caused by background source loading
 - [x] **Phase 2: Mobile Layout** - Restructure room view and non-room screens for phone and tablet viewports
-- [x] **Phase 3: Mobile Component Polish** - Adapt header, tabs, and interactive elements for mobile usability (completed 2026-03-08)
+- [ ] **Phase 3: Mobile Component Polish** - Adapt header, tabs, and interactive elements for mobile usability (gap closure in progress)
 
 ## Phase Details
 
@@ -48,9 +48,10 @@ Plans:
   1. User on a phone sees a simplified header showing the logo and live indicator only -- source status pills are hidden to save vertical space
   2. User on a narrow viewport can horizontally swipe through all room tabs without any tab being cut off or overflowing the screen edge
   3. User can tap any button, tab, or filter control on a phone without accidentally hitting adjacent elements -- all interactive targets are at least 44px in both dimensions
-**Plans:** 1/1 plans complete
+**Plans:** 2 plans
 Plans:
-- [ ] 03-01-PLAN.md -- Header collapse, tab scroll-snap, and touch target sizing
+- [x] 03-01-PLAN.md -- Header collapse, tab scroll-snap, and touch target sizing
+- [ ] 03-02-PLAN.md -- Gap closure: fix tip button CSS specificity and Switch Draft visibility across views
 
 ## Progress
 
@@ -58,7 +59,7 @@ Plans:
 |-------|---------------|--------|-----------|
 | 1. Loading Stability | 2/2 | Complete | 2026-03-08 |
 | 2. Mobile Layout | 2/2 | Complete | 2026-03-08 |
-| 3. Mobile Component Polish | 1/1 | Complete   | 2026-03-08 |
+| 3. Mobile Component Polish | 1/2 | Gap Closure | -- |
 
 ---
 *Roadmap created: 2026-03-08*
