@@ -69,7 +69,7 @@ body{background:var(--bg);color:var(--text);font-family:'Sora',sans-serif;min-he
 .hdr{padding:10px 12px;gap:10px}
 .hdr-logo{font-size:18px}
 .src-pills{display:none}
-.tip-btn{display:none}
+.hdr-right .tip-btn{display:none}
 .hdr-sub{display:none}
 .hdr-right{gap:8px}
 .room-top{padding:var(--sp-sm) var(--sp-md);gap:var(--sp-sm);flex-direction:column;align-items:stretch}
@@ -1900,12 +1900,17 @@ function bindEvents(){
   });
   const backBtn=document.getElementById('backToSetup');
   if(backBtn)backBtn.onclick=()=>{S.view='setup';S.draftList=[];render();};
-  // Switch draft button (visible only in room view when we have a draft list)
+  // Switch draft button (visible whenever user has drafts, adapts behavior per view)
   const sdBtn=document.getElementById('switchDraftBtn');
   if(sdBtn){
-    if(S.view==='room'&&S.draftList.length>1){sdBtn.style.display='';sdBtn.onclick=()=>{stopPolling();S.view='draftSelect';S.draft=null;S.picks=[];render();};}
-    else if(S.view==='room'){sdBtn.style.display='';sdBtn.onclick=()=>{stopPolling();S.view='setup';render();};}
-    else{sdBtn.style.display='none';}
+    if(S.draftList.length>0){
+      sdBtn.style.display='';
+      if(S.view==='room'&&S.draftList.length>1){sdBtn.onclick=()=>{stopPolling();S.view='draftSelect';S.draft=null;S.picks=[];render();};}
+      else if(S.view==='room'){sdBtn.onclick=()=>{stopPolling();S.view='setup';render();};}
+      else{sdBtn.onclick=()=>{S.view='setup';S.draftList=[];render();};}
+    } else {
+      sdBtn.style.display='none';
+    }
   }
   document.querySelectorAll('.pos-filter[data-pos]').forEach(b=>{b.onclick=()=>{S.posFilter=b.dataset.pos;render();};});
   const rt=document.getElementById('rookieToggle');if(rt)rt.onclick=()=>{S.showRookies=!S.showRookies;render();};

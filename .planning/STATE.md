@@ -3,13 +3,13 @@ gsd_state_version: 1.0
 milestone: v1.0
 milestone_name: milestone
 status: completed
-stopped_at: Completed 03-01-PLAN.md
-last_updated: "2026-03-08T13:42:51.912Z"
+stopped_at: Completed 03-02-PLAN.md (gap closure)
+last_updated: "2026-03-08T15:00:00.000Z"
 progress:
   total_phases: 3
   completed_phases: 3
-  total_plans: 5
-  completed_plans: 5
+  total_plans: 6
+  completed_plans: 6
   percent: 100
 ---
 
@@ -22,7 +22,7 @@ progress:
 
 ## Current Position
 **Phase:** 03-mobile-component-polish (complete)
-**Plan:** 03-01 (complete)
+**Plan:** 03-02 (complete, gap closure)
 **Status:** Milestone complete
 **Progress:** [██████████] 100%
 
@@ -35,6 +35,7 @@ progress:
 - Plan 02-01 duration: 91s (2 tasks, 1 file modified)
 - Plan 02-02 duration: 66s (1 task, 1 file modified)
 - Plan 03-01 duration: 78s (2 tasks, 1 file modified)
+- Plan 03-02: gap closure (2 tasks, 1 file modified)
 
 ## Accumulated Context
 
@@ -68,6 +69,8 @@ progress:
 - Setup/draft-select screens get reduced padding on phones via max-width:599px media query
 - Tip CTA stacks vertically on phone viewports
 - Mobile header hides src-pills, tip-btn, hdr-sub via display:none (DOM preserved for JS)
+- Tip button mobile hide uses .hdr-right .tip-btn specificity (0,2,0) to beat base rule
+- Switch Draft button visible whenever S.draftList.length > 0, with view-adaptive onclick
 - Room tabs use scroll-snap-type:x mandatory with flex-shrink:0 for horizontal swiping
 - All interactive elements have min-height:44px on mobile with inline-flex centering
 - touch-action:manipulation on buttons/links/rows prevents 300ms tap delay
@@ -80,8 +83,8 @@ None -- all milestone plans complete
 
 ## Session Continuity
 **Last session:** 2026-03-08T13:40:23.755Z
-**Stopped at:** Completed 03-01-PLAN.md
-**Next action:** Verify work and complete milestone
+**Stopped at:** Completed 03-02-PLAN.md (gap closure)
+**Next action:** Complete milestone
 
 ---
 *State initialized: 2026-03-08*
