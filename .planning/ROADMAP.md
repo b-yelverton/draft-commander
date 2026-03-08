@@ -35,7 +35,10 @@ Plans:
   1. User on a phone (< 600px) sees the room view as a single scrollable column with the board panel on top and sidebar content stacked below -- no content is hidden or clipped
   2. User on a tablet (600px-1000px) sees an adapted room layout with appropriate content stacking that uses available width without reverting to the desktop two-column grid
   3. User on a phone can navigate through the setup screen, loading screen, and draft selection screen without any element overflowing the viewport or requiring horizontal scroll
-**Plans**: TBD
+**Plans:** 2 plans
+Plans:
+- [ ] 02-01-PLAN.md -- Room grid mobile-first restructure with sidebar stacking and trade evaluator adaptation
+- [ ] 02-02-PLAN.md -- Non-room screen mobile adaptation (draft grid, setup, loading)
 
 ### Phase 3: Mobile Component Polish
 **Goal**: Individual UI components (header, tabs, buttons, filters) are adapted for touch interaction and narrow viewports
@@ -52,7 +55,7 @@ Plans:
 | Phase | Plans Complete | Status | Completed |
 |-------|---------------|--------|-----------|
 | 1. Loading Stability | 2/2 | Complete | 2026-03-08 |
-| 2. Mobile Layout | 0/? | Not started | - |
+| 2. Mobile Layout | 0/2 | Not started | - |
 | 3. Mobile Component Polish | 0/? | Not started | - |
 
 ---
