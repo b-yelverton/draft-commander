@@ -139,6 +139,11 @@ body{background:var(--bg);color:var(--text);font-family:'Sora',sans-serif;min-he
 .trade-input input{min-height:44px}
 .weight-row input[type=range]{height:44px}
 button,a,.p-row,.trade-chip,.fpick-chip{touch-action:manipulation}
+/* Mobile glass reduction */
+:root{--glass-blur:8px}
+@supports (backdrop-filter:blur(1px)){
+  .section-hdr{-webkit-backdrop-filter:none;backdrop-filter:none;background:var(--surface)}
+}
 }
 .room-top{grid-column:1/-1;background:var(--surface);border-bottom:2px solid var(--border);padding:var(--sp-md) var(--sp-xl);display:flex;align-items:center;gap:var(--sp-lg);flex-wrap:wrap}
 .room-top .pick-clock{font-family:'Instrument Serif',serif;font-style:italic;font-size:22px;font-weight:400;color:var(--text)}
