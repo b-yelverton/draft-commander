@@ -1080,7 +1080,7 @@ function renderRoom(){
           <div class="label">${r.label}</div>
           <div class="player"><span class="p-pos p-${r.player.position}" style="margin-right:6px">${r.player.position}</span>${r.player.name}</div>
           <div class="reason">${r.reason}</div>
-        </div>`).join(''):'<div style="font-size:12px;color:var(--text2);line-height:1.6;padding:8px 0"><span style="color:var(--text3)">Loading value sources...</span><br><span style="font-size:11px;color:var(--text3)">BPA recommendations appear once FantasyCalc data loads.</span></div>'}
+        </div>`).join(''):(['ktc','dd','dp'].some(k=>S.sources[k].status==='loading'||S.sources[k].status==='idle')?'<div class="skeleton skeleton-card" style="opacity:1"></div><div class="skeleton skeleton-card" style="opacity:0.7"></div><div class="skeleton skeleton-card" style="opacity:0.4;height:60px"></div>':'<div style="font-size:12px;color:var(--text2);line-height:1.6;padding:8px 0"><span style="color:var(--text3)">No recommendations yet.</span><br><span style="font-size:11px;color:var(--text3)">BPA recommendations appear once FantasyCalc data loads.</span></div>')}
       </div>
       <div class="sb-section">
         <div class="sb-title">📋 Recent Picks</div>
@@ -1089,7 +1089,7 @@ function renderRoom(){
       </div>
       <div class="sb-section">
         <div class="sb-title">📊 Scarcity</div>
-        ${['QB','RB','WR','TE'].map(pos=>{const a=getBestAvailable(pos);const gap=a.length>5?(a[5].compositeRank-a[0].compositeRank):0;
+        ${S.sources.fc.status!=='live'?'<div class="skeleton skeleton-row"></div><div class="skeleton skeleton-row"></div><div class="skeleton skeleton-row"></div><div class="skeleton skeleton-row"></div>':['QB','RB','WR','TE'].map(pos=>{const a=getBestAvailable(pos);const gap=a.length>5?(a[5].compositeRank-a[0].compositeRank):0;
           return`<div style="display:flex;align-items:center;gap:6px;padding:3px 0;border-bottom:1px solid var(--border)">
             <span class="p-pos p-${pos}">${pos}</span><span style="font-size:10px;flex:1">${a[0]?.name||'—'}</span>
             <span style="font-size:9px;color:var(--text3)" class="mono">${a.length} left</span>
@@ -1114,10 +1114,10 @@ function renderBoard(ba,recs,teams,recent){
     <div style="display:flex;padding:4px 14px;border-bottom:1px solid var(--border);font-size:9px;color:var(--text3);font-family:'JetBrains Mono',monospace">
       <span style="width:30px">RK</span><span style="width:26px"></span><span style="flex:1">PLAYER</span><span style="width:28px">TM</span>
       <span style="width:36px;text-align:right;color:var(--fc-color)">FC</span>
-      ${hasKtc?'<span style="width:36px;text-align:right;color:var(--ktc-color)">KTC</span>':''}
-      ${hasDd?'<span style="width:36px;text-align:right;color:var(--dd-color)">DD</span>':''}
-      ${hasDp?'<span style="width:36px;text-align:right;color:var(--dp-color)">DP</span>':''}
-      ${hasKtc?'<span style="width:50px;text-align:center">Δ RNK</span>':''}
+      <span style="width:36px;text-align:right;color:var(--ktc-color)">KTC</span>
+      <span style="width:36px;text-align:right;color:var(--dd-color)">DD</span>
+      <span style="width:36px;text-align:right;color:var(--dp-color)">DP</span>
+      <span style="width:50px;text-align:center">Δ RNK</span>
     </div>
     ${ba.slice(0,100).map((p,idx)=>{const isRec=recs.some(r=>r.player.id===p.id);
       const dvg=p.divergence;const dvgCls=dvg==='high'?'divergent':dvg==='medium'?'divergent':'';
@@ -1128,7 +1128,9 @@ function renderBoard(ba,recs,teams,recent){
         const arrow=rd>0?'↑':rd<0?'↓':'';
         rankDeltaHtml=`<span style="width:50px;text-align:center;font-family:'JetBrains Mono',monospace;font-size:10px;color:${color}">${rd>0?'+':''}${rd} ${arrow}</span>`;
       }else if(hasKtc){
-        rankDeltaHtml='<span style="width:50px;text-align:center;font-size:10px;color:var(--text3)">—</span>';
+        rankDeltaHtml='<span style="width:50px;text-align:center;font-size:10px;color:var(--text3)">--</span>';
+      }else{
+        rankDeltaHtml='<span style="width:50px;text-align:center;font-size:10px" class="val-pending">--</span>';
       }
 
       return`<div class="p-row ${isRec?'recommended':''} ${dvgCls}">
@@ -1137,10 +1139,10 @@ function renderBoard(ba,recs,teams,recent){
         <span class="p-name">${p.name}</span>
         <span class="p-team">${p.team||''}</span>
         <span class="p-val fc" style="width:36px">#${p.fcRank}</span>
-        ${hasKtc?`<span class="p-val ktc" style="width:36px">${p.ktcRank?'#'+p.ktcRank:'—'}</span>`:''}
-        ${hasDd?`<span class="p-val dd" style="width:36px">${p.ddRank?'#'+p.ddRank:'—'}</span>`:''}
-        ${hasDp?`<span class="p-val dp" style="width:36px">${p.dpRank?'#'+Math.round(p.dpRank):'—'}</span>`:''}
-        ${hasKtc?rankDeltaHtml:''}
+        <span class="p-val ktc" style="width:36px">${hasKtc?(p.ktcRank?'#'+p.ktcRank:'--'):'<span class="val-pending">--</span>'}</span>
+        <span class="p-val dd" style="width:36px">${hasDd?(p.ddRank?'#'+p.ddRank:'--'):'<span class="val-pending">--</span>'}</span>
+        <span class="p-val dp" style="width:36px">${hasDp?(p.dpRank?'#'+Math.round(p.dpRank):'--'):'<span class="val-pending">--</span>'}</span>
+        ${rankDeltaHtml}
       </div>`;}).join('')}
   </div>`;
 }
