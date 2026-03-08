@@ -22,7 +22,10 @@
   2. Board columns (rank, name, position, value) occupy their full grid slots immediately on room entry, even before all sources have loaded -- no column width snapping when data arrives
   3. Sidebar sections display shimmer skeleton placeholders while their data is pending, then smoothly replace with real content when available
   4. User watching the room view during a live draft sees source pills update in the header but experiences zero layout disruption in the board or sidebar areas
-**Plans**: TBD
+**Plans:** 2 plans
+Plans:
+- [ ] 01-01-PLAN.md -- Stabilize board columns and add skeleton loading placeholders
+- [ ] 01-02-PLAN.md -- Targeted subtree updates with rAF batching for source loaders
 
 ### Phase 2: Mobile Layout
 **Goal**: Room view and all pre-room screens are usable on phone and tablet viewports without horizontal scrolling or content clipping
@@ -48,7 +51,7 @@
 
 | Phase | Plans Complete | Status | Completed |
 |-------|---------------|--------|-----------|
-| 1. Loading Stability | 0/? | Not started | - |
+| 1. Loading Stability | 0/2 | Planning complete | - |
 | 2. Mobile Layout | 0/? | Not started | - |
 | 3. Mobile Component Polish | 0/? | Not started | - |
 
