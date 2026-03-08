@@ -1,5 +1,5 @@
 ---
-status: complete
+status: diagnosed
 phase: 03-mobile-component-polish
 source: [03-01-SUMMARY.md]
 started: 2026-03-08T13:45:00Z
@@ -51,16 +51,22 @@ skipped: 1
   reason: "User reported: tip button is visible and is a different size than switch draft"
   severity: major
   test: 1
-  root_cause: ""
-  artifacts: []
-  missing: []
+  root_cause: "CSS source-order defeat: @media(max-width:599px) at line 68 sets .tip-btn{display:none}, but base .tip-btn{display:inline-flex} at line 274 has equal specificity and wins because it appears later in source order"
+  artifacts:
+    - path: "index.html"
+      issue: "Mobile media query (line 68) appears before base .tip-btn styles (line 274) — last declaration wins at equal specificity"
+  missing:
+    - "Increase specificity of mobile .tip-btn rule (e.g., .hdr-right .tip-btn{display:none}) or move media query after base styles"
   debug_session: ""
 - truth: "Mobile header remains stable and correctly collapsed across all rooms/screens"
   status: failed
   reason: "User reported: mobile header breaks depending on room"
   severity: major
   test: 4
-  root_cause: ""
-  artifacts: []
-  missing: []
+  root_cause: "Switch Draft button visibility is toggled by JS (lines 1904-1908) — shown only when S.view==='room', hidden on setup/loading/draftSelect. On non-room screens at mobile width, hdr-right contains only the live indicator, making header look sparse/broken"
+  artifacts:
+    - path: "index.html"
+      issue: "bindEvents() lines 1904-1908 toggle switchDraftBtn display based on view, causing header layout shift across screens"
+  missing:
+    - "Show Switch Draft button whenever S.draftList.length > 0 (after user has connected), not just in room view — keeps header consistent across draftSelect and room views"
   debug_session: ""
