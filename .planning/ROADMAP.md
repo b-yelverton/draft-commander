@@ -48,7 +48,9 @@ Plans:
   1. User on a phone sees a simplified header showing the logo and live indicator only -- source status pills are hidden to save vertical space
   2. User on a narrow viewport can horizontally swipe through all room tabs without any tab being cut off or overflowing the screen edge
   3. User can tap any button, tab, or filter control on a phone without accidentally hitting adjacent elements -- all interactive targets are at least 44px in both dimensions
-**Plans**: TBD
+**Plans:** 1 plan
+Plans:
+- [ ] 03-01-PLAN.md -- Header collapse, tab scroll-snap, and touch target sizing
 
 ## Progress
 
@@ -56,7 +58,7 @@ Plans:
 |-------|---------------|--------|-----------|
 | 1. Loading Stability | 2/2 | Complete | 2026-03-08 |
 | 2. Mobile Layout | 2/2 | Complete | 2026-03-08 |
-| 3. Mobile Component Polish | 0/? | Not started | - |
+| 3. Mobile Component Polish | 0/1 | Not started | - |
 
 ---
 *Roadmap created: 2026-03-08*
