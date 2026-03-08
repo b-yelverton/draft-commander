@@ -30,7 +30,7 @@
   4. All UI elements respond to theme change — no hardcoded colors remain that ignore the active theme
 **Plans:** 2 plans
 Plans:
-- [ ] 04-01-PLAN.md -- Color token migration to [data-theme] selectors, dark palette, rgba() conversion, FOWT prevention
+- [x] 04-01-PLAN.md -- Color token migration to [data-theme] selectors, dark palette, rgba() conversion, FOWT prevention
 - [ ] 04-02-PLAN.md -- Theme toggle button, smooth transitions, system preference listener
 
 ### Phase 5: Glassmorphism & Visual Refresh
@@ -65,7 +65,7 @@ Plans:
 
 | Phase | Plans Complete | Status | Completed |
 |-------|---------------|--------|-----------|
-| 4. Dark Mode Foundation | 0/2 | Pending | -- |
+| 4. Dark Mode Foundation | 1/2 | Active | -- |
 | 5. Glassmorphism & Visual Refresh | 0/? | Pending | -- |
 | 6. Progressive Hydration | 0/? | Pending | -- |
 | 7. Design Quality Pass | 0/? | Pending | -- |

@@ -9,8 +9,8 @@
 ### Dark Mode & Theming
 
 - [ ] **THEME-01**: App supports dark mode and light mode with system preference detection (prefers-color-scheme) and manual toggle that persists in localStorage
-- [ ] **THEME-02**: No flash of wrong theme (FOWT) on page load — correct theme renders from first paint via blocking head script
-- [ ] **THEME-03**: All color tokens use CSS custom properties under `[data-theme]` selectors — no hardcoded rgba() values that bypass theming
+- [x] **THEME-02**: No flash of wrong theme (FOWT) on page load — correct theme renders from first paint via blocking head script
+- [x] **THEME-03**: All color tokens use CSS custom properties under `[data-theme]` selectors — no hardcoded rgba() values that bypass theming
 - [ ] **THEME-04**: Theme transition is smooth (background-color, color, border-color animate) with no transition on initial page load
 
 ### Glassmorphism & Visual Refresh
@@ -42,8 +42,8 @@
 | Requirement | Phase | Status |
 |-------------|-------|--------|
 | THEME-01 | Phase 4 | Pending |
-| THEME-02 | Phase 4 | Pending |
-| THEME-03 | Phase 4 | Pending |
+| THEME-02 | Phase 4 | Complete (04-01) |
+| THEME-03 | Phase 4 | Complete (04-01) |
 | THEME-04 | Phase 4 | Pending |
 | GLASS-01 | Phase 5 | Pending |
 | GLASS-02 | Phase 5 | Pending |
