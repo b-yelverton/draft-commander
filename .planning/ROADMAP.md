@@ -12,7 +12,7 @@
 
 ## Phases
 
-- [ ] **Phase 4: Dark Mode Foundation** - Theme toggle, color token migration, FOWT prevention (2 plans)
+- [x] **Phase 4: Dark Mode Foundation** - Theme toggle, color token migration, FOWT prevention (2 plans)
 - [ ] **Phase 5: Glassmorphism & Visual Refresh** - Backdrop-filter effects, gradient backgrounds, glass surfaces
 - [ ] **Phase 6: Progressive Hydration** - Targeted column updates, fade-in animations, scroll preservation
 - [ ] **Phase 7: Design Quality Pass** - Impeccable-guided color audit, contrast verification, visual consistency
@@ -31,7 +31,7 @@
 **Plans:** 2 plans
 Plans:
 - [x] 04-01-PLAN.md -- Color token migration to [data-theme] selectors, dark palette, rgba() conversion, FOWT prevention
-- [ ] 04-02-PLAN.md -- Theme toggle button, smooth transitions, system preference listener
+- [x] 04-02-PLAN.md -- Theme toggle button, smooth transitions, system preference listener
 
 ### Phase 5: Glassmorphism & Visual Refresh
 **Goal**: Key UI surfaces use modern glass/blur aesthetics that enhance depth and visual hierarchy
