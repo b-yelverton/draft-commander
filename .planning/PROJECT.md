@@ -75,9 +75,13 @@ v1.0 delivered loading stability (targeted subtree updates, skeleton loading, rA
 | Targeted subtree updates | Replaced full DOM re-render for source loading paths | ✓ Good (v1.0) |
 | Mobile-first CSS approach | Base styles target mobile, min-width restores desktop | ✓ Good (v1.0) |
 
-## Next Milestone Goals
+## Next Milestone: v1.1 — Design System & Visual Polish
 
-_Run `/gsd:new-milestone` to define next milestone_
+- Dark mode with system preference detection + manual toggle
+- Modern glass/blur aesthetic (glassmorphism on sticky elements)
+- Progressive source hydration (fade-in animations, scroll preservation)
+- Design quality pass with Impeccable audit
+- 12 requirements across 4 phases (4-7)
 
 ---
 *Last updated: 2026-03-08 after v1.0 completion*
