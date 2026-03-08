@@ -24,7 +24,7 @@
   4. User watching the room view during a live draft sees source pills update in the header but experiences zero layout disruption in the board or sidebar areas
 **Plans:** 2 plans
 Plans:
-- [ ] 01-01-PLAN.md -- Stabilize board columns and add skeleton loading placeholders
+- [x] 01-01-PLAN.md -- Stabilize board columns and add skeleton loading placeholders
 - [ ] 01-02-PLAN.md -- Targeted subtree updates with rAF batching for source loaders
 
 ### Phase 2: Mobile Layout
@@ -51,7 +51,7 @@ Plans:
 
 | Phase | Plans Complete | Status | Completed |
 |-------|---------------|--------|-----------|
-| 1. Loading Stability | 0/2 | Planning complete | - |
+| 1. Loading Stability | 1/2 | Executing | - |
 | 2. Mobile Layout | 0/? | Not started | - |
 | 3. Mobile Component Polish | 0/? | Not started | - |
 

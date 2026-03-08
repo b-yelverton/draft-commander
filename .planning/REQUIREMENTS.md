@@ -9,9 +9,9 @@ Requirements for this milestone. Each maps to roadmap phases.
 
 ### Loading & Render Stability
 
-- [ ] **LOAD-01**: Room view does not visually break or overflow when background sources (KTC, DD, DP) load and trigger re-render
-- [ ] **LOAD-02**: Board column layout remains stable as sources load — columns always occupy their slots regardless of data availability
-- [ ] **LOAD-03**: Sidebar shows skeleton placeholders with shimmer animation while background sources are still loading
+- [x] **LOAD-01**: Room view does not visually break or overflow when background sources (KTC, DD, DP) load and trigger re-render
+- [x] **LOAD-02**: Board column layout remains stable as sources load — columns always occupy their slots regardless of data availability
+- [x] **LOAD-03**: Sidebar shows skeleton placeholders with shimmer animation while background sources are still loading
 - [ ] **LOAD-04**: Source loading does not cause full-page flash or layout shift visible to the user
 
 ### Mobile Layout
@@ -56,9 +56,9 @@ Which phases cover which requirements. Updated during roadmap creation.
 
 | Requirement | Phase | Status |
 |-------------|-------|--------|
-| LOAD-01 | Phase 1 | Pending |
-| LOAD-02 | Phase 1 | Pending |
-| LOAD-03 | Phase 1 | Pending |
+| LOAD-01 | Phase 1 | Complete |
+| LOAD-02 | Phase 1 | Complete |
+| LOAD-03 | Phase 1 | Complete |
 | LOAD-04 | Phase 1 | Pending |
 | MOBI-01 | Phase 2 | Pending |
 | MOBI-02 | Phase 2 | Pending |
