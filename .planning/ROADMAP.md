@@ -55,6 +55,10 @@ Plans:
   1. User in room view sees KTC/DD/DP column values fade in smoothly as each source finishes loading — no instant snap
   2. User scrolled halfway down the board does not lose their scroll position when a background source loads
   3. User with prefers-reduced-motion enabled sees values appear instantly without animation
+**Plans:** 2 plans
+Plans:
+- [ ] 06-01-PLAN.md — Targeted DOM hydration: valIn CSS animation, hydrateSourceColumn() function, data-player-id attributes
+- [ ] 06-02-PLAN.md — Visual verification of hydration across themes, viewports, and reduced-motion
 
 ### Phase 7: Design Quality Pass
 **Goal**: Both themes have cohesive, accessible color palettes with clear visual hierarchy — verified by Impeccable audit
@@ -71,7 +75,7 @@ Plans:
 |-------|---------------|--------|-----------|
 | 4. Dark Mode Foundation | 2/2 | Complete | 2026-03-08 |
 | 5. Glassmorphism & Visual Refresh | 2/2 | Complete | 2026-03-08 |
-| 6. Progressive Hydration | 0/? | Pending | -- |
+| 6. Progressive Hydration | 0/2 | Pending | -- |
 | 7. Design Quality Pass | 0/? | Pending | -- |
 
 ---
