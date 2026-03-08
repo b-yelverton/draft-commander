@@ -3,14 +3,14 @@ gsd_state_version: 1.0
 milestone: v1.1
 milestone_name: Design System & Visual Polish
 status: executing
-stopped_at: Completed 04-02-PLAN.md (task 1)
-last_updated: "2026-03-08T14:37:03Z"
+stopped_at: Completed 05-02-PLAN.md (task 2)
+last_updated: "2026-03-08T15:00:00Z"
 progress:
   total_phases: 4
-  completed_phases: 1
-  total_plans: 2
-  completed_plans: 2
-  percent: 25
+  completed_phases: 2
+  total_plans: 4
+  completed_plans: 4
+  percent: 50
 ---
 
 # Project State: Draft Commander
@@ -21,15 +21,17 @@ progress:
 **Architecture:** Single-file static app (index.html ~2050 lines), vanilla JS, no build step, Vercel deployment
 
 ## Current Position
-**Phase:** 04-dark-mode-foundation (complete)
-**Plan:** 04-01 complete, 04-02 complete
-**Status:** Phase 04 fully executed
-**Progress:** [##--------] 25%
+**Phase:** 05-glassmorphism-visual-refresh (complete)
+**Plan:** 05-01 complete, 05-02 complete
+**Status:** Phase 05 fully executed
+**Progress:** [#####-----] 50%
 
 ## Performance Metrics
 - v1.0: 3 phases, 6 plans, 10 requirements — completed 2026-03-08
 - 04-01: 2 tasks, 1 file, 172s — completed 2026-03-08
 - 04-02: 1 task, 1 file, 67s — completed 2026-03-08
+- 05-01: 2 tasks, 1 file, ~60s — completed 2026-03-08
+- 05-02: 2 tasks, 1 file, ~45s — completed 2026-03-08
 
 ## Accumulated Context
 
@@ -45,6 +47,9 @@ progress:
 | CSS utility classes for JS rgba | .fpick-chip-recv and .trade-chip-pick replace inline styles |
 | onclick for toggle button | Button lives outside #app, never re-rendered, so onclick attribute is safe |
 | requestAnimationFrame for no-transitions removal | Ensures first paint completes before enabling transitions |
+| @supports progressive enhancement for glass | Solid backgrounds remain as fallback; glass only when backdrop-filter supported |
+| --glass-blur token (not hardcoded) for .hdr/.room-top | Allows mobile override via single variable change |
+| .section-hdr glass removed on mobile | Multiple sticky glass headers cause cumulative GPU load during scroll |
 
 ### Technical Context
 - All color tokens now in [data-theme="light"] and [data-theme="dark"] selectors
@@ -57,6 +62,9 @@ progress:
 - Targeted column hydration solves both snap-in and scroll preservation issues
 - Current innerHTML subtree updates (renderBoardInner/renderSidebarInner) preserved for pick events
 - Impeccable plugin to guide design quality decisions
+- Glass variables: --surface-rgb, --glass-blur (12px desktop/8px mobile), --glass-opacity (0.72 light/0.78 dark)
+- @supports block applies glass to .hdr, .modal-overlay, .room-top, .section-hdr with -webkit- prefix
+- Mobile @media(max-width:599px) reduces blur to 8px, removes glass from .section-hdr entirely
 
 ### Research
 - .planning/research/DESIGN-SYSTEM.md — dark mode, glassmorphism, color palettes
@@ -70,8 +78,8 @@ None
 
 ## Session Continuity
 **Last session:** 2026-03-08
-**Stopped at:** Completed 04-02-PLAN.md (task 1)
-**Next action:** Begin phase 05 (glassmorphism)
+**Stopped at:** Completed 05-02-PLAN.md (task 2) — user approved visual verification
+**Next action:** Begin phase 06 (progressive hydration)
 
 ---
 *State initialized: 2026-03-08*

@@ -13,7 +13,7 @@
 ## Phases
 
 - [x] **Phase 4: Dark Mode Foundation** - Theme toggle, color token migration, FOWT prevention (2 plans)
-- [ ] **Phase 5: Glassmorphism & Visual Refresh** - Backdrop-filter effects, gradient backgrounds, glass surfaces (2 plans)
+- [x] **Phase 5: Glassmorphism & Visual Refresh** - Backdrop-filter effects, gradient backgrounds, glass surfaces (2 plans)
 - [ ] **Phase 6: Progressive Hydration** - Targeted column updates, fade-in animations, scroll preservation
 - [ ] **Phase 7: Design Quality Pass** - Impeccable-guided color audit, contrast verification, visual consistency
 
@@ -44,8 +44,8 @@ Plans:
   4. In a browser without backdrop-filter support, the app displays solid backgrounds with no visual breakage
 **Plans:** 2 plans
 Plans:
-- [ ] 05-01-PLAN.md — Glass variables and @supports backdrop-filter for .hdr, .modal-overlay, .room-top, .section-hdr
-- [ ] 05-02-PLAN.md — Mobile glass performance overrides and visual verification
+- [x] 05-01-PLAN.md — Glass variables and @supports backdrop-filter for .hdr, .modal-overlay, .room-top, .section-hdr
+- [x] 05-02-PLAN.md — Mobile glass performance overrides and visual verification
 
 ### Phase 6: Progressive Hydration
 **Goal**: Background source loading produces smooth visual transitions instead of value snapping, with scroll position preserved
@@ -70,7 +70,7 @@ Plans:
 | Phase | Plans Complete | Status | Completed |
 |-------|---------------|--------|-----------|
 | 4. Dark Mode Foundation | 2/2 | Complete | 2026-03-08 |
-| 5. Glassmorphism & Visual Refresh | 0/2 | Pending | -- |
+| 5. Glassmorphism & Visual Refresh | 2/2 | Complete | 2026-03-08 |
 | 6. Progressive Hydration | 0/? | Pending | -- |
 | 7. Design Quality Pass | 0/? | Pending | -- |
 
