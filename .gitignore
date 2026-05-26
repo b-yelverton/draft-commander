@@ -1,3 +1,15 @@
 .vercel
 node_modules/
 test-results/
+
+# 2026-05-26 sec-audit S12: secrets patterns (mirrors homelab/.gitignore).
+# Keeps env files + keys + credential bundles from being accidentally staged.
+*.key
+*.pem
+*.pub.bak
+.env
+.env.*
+!.env.example
+secrets/
+*.secret
+credentials.json
